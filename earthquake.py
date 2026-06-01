@@ -160,7 +160,16 @@ score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규
          (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
 order = score.sort_values(ascending=False).index.tolist()
 labels = ["고위험", "중위험", "저위험"]
-grade_map = {int(c): labels[i] for i, c in enumerate(order)}
+
+# int(c) 대신 결측치를 방어하는 안전한 매핑 방식
+grade_map = {}
+for i, c in enumerate(order):
+    try:
+        if pd.isna(c):  # 만약 빈 값이 들어오면 패스
+            continue
+        grade_map[int(float(c))] = labels[i] if i < len(labels) else "저위험"
+    except (ValueError, TypeError):
+        continue  # 숫자로 변환할 수 없는 값은 무시하고 안전하게 진행
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371.0
