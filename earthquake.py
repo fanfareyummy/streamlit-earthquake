@@ -33,7 +33,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🖼️ 사진 속 디자인 100% 똑같이 구현하는 CSS 광기 (중괄호 탈출 완료)
+# 🖼️ 사진 속 디자인 100% 똑같이 구현하는 CSS (에러 해결 완료)
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -137,14 +137,14 @@ st.markdown(
         font-size: 11px;
     }}
 
-    /* 5. ⭐ 대박 포인트: 액정에서 하늘로 뿜어지는 홀로그램 투사 빛줄기 효과 */
+    /* 5. 홀로그램 투사 빛줄기 효과 (f-string 단일 중괄호 버그 원인 해결) */
     .hologram-light-beam {{
         position: absolute;
         left: 180px;
         bottom: 120px;
         width: 300px;
         height: 320px;
-        background:決 linear-gradient(45deg, rgba(179, 157, 219, 0.4) 0%, rgba(128, 222, 234, 0.2) 60%, transparent 100%);
+        background: linear-gradient(45deg, rgba(179, 157, 219, 0.4) 0%, rgba(128, 222, 234, 0.2) 60%, transparent 100%);
         clip-path: polygon(0% 100%, 30% 100%, 100% 0%, 30% 0%);
         pointer-events: none;
         z-index: 1;
@@ -169,7 +169,7 @@ st.markdown(
         padding: 10px;
     }}
 
-    /* 7. [하단] 초롱핑 감지 위험군 매칭 텍스트 보드 */
+    /* 7. [하단] 지진 위험군 매칭 텍스트 보드 */
     .photo-bottom-card {{
         background: rgba(255, 255, 255, 0.8);
         border: 2px solid #fff;
@@ -210,7 +210,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 철저히 원래 뼈대인 [지진 위험군 분석] 데이터 로직 가동
+# 📊 [지진 위험군 분석] 데이터 처리 시스템
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -235,7 +235,6 @@ if os.path.exists(df_path):
 else:
     df = load_pure_quake_data()
 
-# 지진 대피 위험군 클러스터링 산출
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 X = df[FEATURES]
@@ -273,7 +272,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 조준 타겟 좌표 입력 패널
 st.markdown("### 🎯 레이더 타겟 크로스헤어 좌표 설정")
 cx, cy = st.columns(2)
 with cx:
@@ -283,7 +281,6 @@ with cy:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 사진 레이아웃과 일치하는 팩트&지구본 스테이지 메인 가동
 if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매핑 스캔 시작", use_container_width=True):
     dist = haversine(lat, lon, df["위도"].values, df["경도"].values)
     near_idx = np.argsort(dist)[:20]
@@ -297,13 +294,11 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    # 사진 구조 재현: [왼쪽 팩트기기 + 중앙 공중 3D 지도]과 [오른쪽 2D 격자 그래프] 분할
     col_left_stage, col_right_graph = st.columns([7, 5])
     
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 스크린")
         
-        # HTML 컨테이너 생성 (팩트 바디 + 홀로그램 빛줄기)
         st.markdown(
             f"""
             <div class="hologram-stage">
@@ -318,13 +313,11 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     </div>
                 </div>
                 <div class="hologram-light-beam"></div>
-                
                 <div class="globe-floating-container">
             """, 
             unsafe_allow_html=True
         )
         
-        # Pydeck 3D 입체 지구 플로팅 레이어 배치
         show_df = df.sample(min(1200, len(df)), random_state=42).copy()
         PASTEL_COLOR = {
             "고위험군": [255, 118, 117, 210],
@@ -361,14 +354,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             tooltip={"text": "지진분석군: {cluster}\n위도: {위도}\n경도: {경도}"}
         )
         st.pydeck_chart(r)
-        st.markdown("</div></div>", unsafe_allow_html=True) # HTML 태그 닫기
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
         
-        # 사진과 완벽히 매칭되는 하얀 격자무늬 파스텔 차트 드로잉
+        # 렌더링 에러 해결: rgba 스트링을 Matplotlib이 이해하는 4원소 튜플 (R, G, B, Alpha)로 명시적 전환
         fig, ax = plt.subplots(figsize=(5.5, 4.8), facecolor='none')
-        ax.set_facecolor('rgba(255, 255, 255, 0.4)')
+        ax.set_facecolor((1, 1, 1, 0.4)) 
         
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#ffeaa7", "저위험군": "#55efc4"}
         for c in sorted(df["cluster"].unique()):
@@ -377,7 +370,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             ax.scatter(sub_set["경도"], sub_set["위도"], s=12, alpha=0.6,
                        color=HEX_MAP.get(g_name, "#b2bec3"), label=g_name)
         
-        # 사진 속 골드 스타 타겟 십자 표식 마킹
         ax.scatter(lon, lat, c="#ffeaa7", s=300, marker="*", edgecolors="#e84393", linewidths=2, zorder=10)
         
         ax.set_xlim(lon-30, lon+30)
@@ -392,21 +384,21 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         plt.close(fig)
 
     # ═════════════════════════════════════════════════════════════
-    # 하단 정보 텍스트 피드 창 (사진 속 아래 텍스트 구성 100% 동일화)
+    # 하단 정보 텍스트 피드 창
     # ═════════════════════════════════════════════════════════════
     tag_cls = "tag-high" if final_grade == "고위험군" else ("tag-mid" if final_grade == "중위험군" else "tag-low")
     
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3>🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
+            <h3>🛸 <b>초롱핑의 오로라 정밀 지진 위험군 피드</b></h3>
             <p style="font-size:16px; font-weight:700;">
-                [ ⚡ 초롱핑 감지! <span class="danger-tag {tag_cls}">{final_grade}</span> ]
+                [ ⚡ 격자 신호 감지 결과: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
             <p style="color:#555; line-height:1.6; font-size:14px;">
                 선택하신 위도 {lat:.4f}°, 경도 {lon:.4f}° 좌표 반경 내부의 격자 진원 분포 신호를 연산한 결과, 
-                가장 지배적인 요소가 <b>{final_grade}</b> 데이터 블록 패턴과 정밀 일치하는 것으로 최종 분석되었습니다츄. 
-                가장 근접한 인근 실제 지진 코어 진앙지와의 거리는 약 <b>{nearest_km:,.1f} km</b> 입니다.
+                가장 지배적인 데이터 요소가 지진 분포 밀집 집단인 <b>{final_grade}</b> 패턴과 정밀하게 매칭되는 것으로 분석되었습니다. 
+                가장 인근에 기록된 실제 지진 중심 코어(진앙지)와의 거리는 약 <b>{nearest_km:,.1f} km</b> 입니다.
             </p>
         </div>
         """,
