@@ -1,4 +1,3 @@
-
 import os
 import streamlit as st
 import numpy as np
@@ -431,5 +430,3 @@ if st.button("🪄 슈팅스타 팩트 오픈! 홀로그램 스캔 스타트!!",
     ax.grid(color='#00ffcc', alpha=0.15, linestyle='--')
     st.pyplot(fig)
     plt.close(fig)
-
-```
