@@ -1,4 +1,6 @@
 import os
+import tempfile
+import urllib.request
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -8,160 +10,184 @@ import matplotlib.font_manager as fm
 import matplotlib as mpl
 
 # ═════════════════════════════════════════════════════════════
-# 🌌 캐치! 티니핑 시즌 5: 슈팅스타팩트 영롱한 오로라 우주 디자인 (CSS)
+# 🌌 구글 폰트 실시간 다운로드로 한글 깨짐 근본적 차단 (Matplotlib용)
 # ═════════════════════════════════════════════════════════════
-st.set_page_config(page_title="반짝반짝! 슈팅스타팩트 오로라 레이더", page_icon="🪐", layout="wide")
+@st.cache_resource(show_spinner=False)
+def load_google_korean_font():
+    mpl.rcParams["axes.unicode_minus"] = False
+    # 나눔고딕 폰트 주소
+    url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".ttf") as f:
+            f.write(urllib.request.urlopen(url).read())
+            font_path = f.name
+        fm.fontManager.addfont(font_path)
+        font_name = fm.FontProperties(fname=font_path).get_name()
+        mpl.rc("font", family=font_name)
+        return font_name
+    except Exception as e:
+        # 백업 시스템 폰트 지정
+        for backup in ["Malgun Gothic", "Apple SD Gothic Neo", "NanumGothic"]:
+            if backup in [f.name for f in fm.fontManager.ttflist]:
+                mpl.rc("font", family=backup)
+                return backup
+    return "sans-serif"
+
+KOREAN_FONT = load_google_korean_font()
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+FEATURES = ["영향도", "규모", "진원깊이"]
+
+# ═════════════════════════════════════════════════════════════
+# ✨ 캐치! 티니핑 시즌 5: 슈팅스타팩트 파스텔 오로라 디바이스 테마 (CSS)
+# ═════════════════════════════════════════════════════════════
+st.set_page_config(page_title="슈팅스타팩트 오로라 레이더", page_icon="🪐", layout="wide")
 
 st.markdown(
-    """
+    f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Orbit&family=Pretendard:wght@500;800&display=swap');
 
-    /* 전체 웹 배경: 깊은 우주와 오로라가 감도는 딥 오션 & 퍼플 그라데이션 */
-    html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Pretendard', 'Orbit', 'Malgun Gothic', sans-serif !important;
-        background: radial-gradient(circle at center, #0d002d 0%, #050014 70%, #010005 100%) !important;
-        color: #e0ffff !important;
-    }
+    /* 글로벌 폰트 및 파스텔톤 은하수 오로라 배경 애니메이션 패널 */
+    html, body, [data-testid="stAppViewContainer"] {{
+        font-family: 'Pretendard', 'Orbit', sans-serif !important;
+        background: linear-gradient(125deg, #161032 0%, #1a1c4b 35%, #152e46 70%, #1b1235 100%) !important;
+        color: #e3f2fd !important;
+    }}
     
-    /* 은하수 성단 가루 효과 */
-    .stMainBlockContainer {
-        background-image: radial-gradient(rgba(0, 255, 204, 0.15) 1px, transparent 40px),
-                          radial-gradient(rgba(138, 43, 226, 0.15) 2px, transparent 30px);
-        background-size: 400px 400px, 300px 300px;
-        background-position: 0 0, 50px 50px;
-    }
+    /* 파스텔 오로라 성운 필터 */
+    .stMainBlockContainer {{
+        background: radial-gradient(circle at 20% 30%, rgba(200, 160, 255, 0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 80% 70%, rgba(150, 230, 220, 0.15) 0%, transparent 50%);
+    }}
 
-    /* 슈팅스타팩트 최상단: 영롱한 오로라 네온 엠블럼 헤더 */
-    .shooting-star-header {
-        background: linear-gradient(135deg, rgba(0, 255, 204, 0.2) 0%, rgba(75, 0, 130, 0.5) 50%, rgba(255, 20, 147, 0.15) 100%);
-        padding: 35px;
-        border-radius: 25px;
-        color: #fff;
+    /* 최상단 슈팅스타 오로라 팩트 타이틀 박스 */
+    .shooting-star-header {{
+        background: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 30px;
         text-align: center;
-        box-shadow: 0 0 35px rgba(0, 255, 204, 0.4), inset 0 0 20px rgba(138, 43, 226, 0.4);
-        border: 2px solid #00ffcc;
-        margin-bottom: 30px;
-        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 40px rgba(162, 126, 255, 0.15);
+        border: 2px solid rgba(200, 180, 255, 0.25);
+        margin-bottom: 35px;
+        backdrop-filter: blur(20px);
     }
-    .shooting-star-header h1 {
+    .shooting-star-header h1 {{
         margin: 0;
-        font-size: 38px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        text-shadow: 0 0 12px #fff, 0 0 25px #00ffcc, 0 0 35px #8a2be2;
-    }
-    .shooting-star-header p {
-        margin: 12px 0 0;
-        font-size: 17px;
-        color: #d1f7ff;
-        font-weight: bold;
-        text-shadow: 0 0 6px rgba(0,0,0,0.8);
-    }
+        font-size: 36px;
+        font-weight: 800;
+        color: #e8dbff;
+        font-family: 'Orbit', sans-serif;
+        text-shadow: 0 0 15px rgba(216, 191, 216, 0.6), 0 0 30px rgba(176, 224, 230, 0.4);
+    }}
+    .shooting-star-header p {{
+        margin: 10px 0 0;
+        font-size: 16px;
+        color: #bce9ff;
+        font-weight: 500;
+    }}
     
-    /* 스타팩트 하트/별빛 오로라 등급 배지 */
-    .risk-badge {
-        display: inline-block;
+    /* ⭐ 대박 기믹: 슈팅스타팩트 실물 디바이스 프레임 구현 ⭐ */
+    .star-fact-hardware-case {{
+        background: radial-gradient(circle at center, #fdf6ff 0%, #ecd3ff 70%, #d8b4f8 100%);
+        border: 8px solid #ffffff;
+        border-radius: 40px;
         padding: 25px;
-        border-radius: 25px;
-        color: #fff;
-        font-size: 26px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(186, 85, 211, 0.2);
+        margin: 20px auto;
+        position: relative;
+    }}
+    
+    /* 스타팩트 기기 상부 금빛 요정 날개&왕별 엠블럼 데코 조형 */
+    .star-fact-hardware-case::before {{
+        content: "⭐ SHOOTING STAR FACT ⭐";
+        display: block;
+        text-align: center;
         font-weight: 900;
+        font-size: 13px;
+        color: #b584e6;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+        text-shadow: 0 1px 2px #fff;
+    }}
+
+    /* 팩트 내부 LCD 가상 투사 스크린 (이 안에서 3D 홀로그램 지도가 표현됨) */
+    .star-fact-lcd-screen {{
+        background: #090620 !important;
+        border: 4px solid #b584e6;
+        border-radius: 25px;
+        padding: 10px;
+        box-shadow: inset 0 0 30px rgba(0, 255, 204, 0.2), 0 0 20px rgba(162, 126, 255, 0.4);
+        overflow: hidden;
+    }}
+    
+    /* 파스텔 레이더 결과 배지 정보창 */
+    .risk-badge {{
+        display: inline-block;
+        padding: 22px;
+        border-radius: 22px;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
         width: 100%;
         text-align: center;
-        border: 2px dashed rgba(255, 255, 255, 0.6);
-        box-shadow: 0 0 25px rgba(0, 255, 204, 0.2);
-    }
-    .fact-high { background: radial-gradient(circle, #ff1493, #4b0082); box-shadow: 0 0 30px rgba(255, 14, 147, 0.6); text-shadow: 0 0 8px #fff; border-color: #ff69b4; }
-    .fact-mid  { background: radial-gradient(circle, #ffaa00, #3a0066); box-shadow: 0 0 30px rgba(255, 170, 0, 0.5); text-shadow: 0 0 8px #fff; border-color: #ffd700; }
-    .fact-low  { background: radial-gradient(circle, #00ffcc, #0a2342); box-shadow: 0 0 30px rgba(0, 255, 204, 0.6); text-shadow: 0 0 8px #000; border-color: #e0ffff; }
-    .fact-none { background: radial-gradient(circle, #483d8b, #120024); box-shadow: 0 0 20px #483d8b; border-color: #8a2be2; }
+        border: 2px dashed rgba(255, 255, 255, 0.4);
+    }}
+    .fact-high {{ background: linear-gradient(135deg, #ff9ebb, #d476aa); box-shadow: 0 8px 25px rgba(255, 158, 187, 0.4); }}
+    .fact-mid  { background: linear-gradient(135deg, #ffcf87, #d99c4c); box-shadow: 0 8px 25px rgba(255, 207, 135, 0.4); }
+    .fact-low  {{ background: linear-gradient(135deg, #a6ffea, #5cbfa6); box-shadow: 0 8px 25px rgba(166, 255, 234, 0.4); color: #22443a !important; }}
+    .fact-none {{ background: linear-gradient(135deg, #c2ccde, #828fa3); box-shadow: 0 8px 20px rgba(194, 204, 222, 0.3); }}
     
-    /* 초롱핑의 오로라 비밀 카드 스크린 */
-    .fact-card {
-        background: rgba(10, 3, 35, 0.85);
-        border: 2px solid #8a2be2;
+    /* 초롱핑의 오로라 비밀 아카이브 보드 */
+    .fact-card {{
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid rgba(182, 140, 255, 0.3);
         border-radius: 22px;
-        padding: 25px;
-        color: #ffffff;
-        box-shadow: inset 0 0 20px rgba(138, 43, 226, 0.4), 0 0 25px rgba(0, 255, 204, 0.2);
-    }
-    .fact-card b { color: #00ffcc; font-size: 18px; text-shadow: 0 0 8px rgba(0,255,204,0.5); }
+        padding: 22px;
+        color: #e1f0fa;
+        box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.03), 0 10px 30px rgba(0,0,0,0.15);
+    }}
+    .fact-card b {{ color: #b6ffd4; font-size: 17px; }
     
-    /* 사이드바 우주 제어 캡슐 */
-    [data-testid="stSidebar"] {
-        background-color: #050014 !important;
-        border-right: 2px solid #8a2be2 !important;
-    }
-    
-    /* 오로라 메트릭 계기판 */
-    div[data-testid="stMetric"] {
-        background: rgba(0, 255, 204, 0.04);
-        border: 1px solid #8a2be2;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 0 20px rgba(138, 43, 226, 0.25);
+    /* 파스텔 계기판 미터 스크린 */
+    div[data-testid="stMetric"] {{
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(166, 255, 234, 0.2);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         text-align: center;
     }
-    div[data-testid="stMetric"] label { color: #d1f7ff !important; font-weight: bold; font-size: 15px; }
-    div[data-testid="stMetric"] div[data-testid="stMetricValue"] { color: #00ffcc !important; font-weight: 900; font-size: 26px !important; text-shadow: 0 0 10px rgba(0,255,204,0.7); }
+    div[data-testid="stMetric"] label {{ color: #cbdced !important; font-weight: 600; font-size: 14px; }
+    div[data-testid="stMetric"] div[data-testid="stMetricValue"] {{ color: #a6ffea !important; font-weight: 800; font-size: 24px !important; text-shadow: 0 0 10px rgba(166,255,234,0.4); }
     
-    /* 오로라 스캔 스타트 버튼 */
-    .stButton>button {
-        background: linear-gradient(90deg, #4b0082, #8a2be2, #00ffcc) !important;
-        color: white !important;
-        font-weight: 900 !important;
-        font-size: 17px !important;
+    /* 파스텔 파동 스캔 개방 버튼 */
+    .stButton>button {{
+        background: linear-gradient(90deg, #bda2ff, #ffb3db, #a2f0ff) !important;
+        color: #312252 !important;
+        font-weight: 800 !important;
+        font-size: 16px !important;
         border-radius: 20px !important;
-        border: 2px solid #00ffcc !important;
-        box-shadow: 0 0 20px rgba(0, 255, 204, 0.3) !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 8px 25px rgba(189, 162, 255, 0.3) !important;
         transition: all 0.3s ease;
         padding: 12px 0px !important;
-    }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 35px #00ffcc !important;
-        color: #fff !important;
-    }
+    }}
+    .stButton>button:hover {{
+        transform: scale(1.01);
+        box-shadow: 0 12px 35px rgba(255, 179, 219, 0.5) !important;
+    }}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 # ═════════════════════════════════════════════════════════════
-# 깨짐 없는 깔끔한 한글 폰트 글로벌 설정 (Matplotlib 전용)
-# ═════════════════════════════════════════════════════════════
-@st.cache_resource(show_spinner=False)
-def setup_korean_font():
-    mpl.rcParams["axes.unicode_minus"] = False
-    local_candidates = [
-        "C:/Windows/Fonts/malgun.ttf", 
-        "C:/Windows/Fonts/malgunbd.ttf",
-        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-    ]
-    for path in local_candidates:
-        if os.path.exists(path):
-            try:
-                fm.fontManager.addfont(path)
-                name = fm.FontProperties(fname=path).get_name()
-                mpl.rc("font", family=name)
-                return name
-            except Exception:
-                pass
-    return "sans-serif"
-
-KOREAN_FONT = setup_korean_font()
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-FEATURES = ["영향도", "규모", "진원깊이"]
-
-# ═════════════════════════════════════════════════════════════
-# 데이터 로드 및 K-Means 머신러닝 프로세스
+# 샘플 데이터 셋 가동 체계
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_sample_data():
     np.random.seed(42)
-    num_samples = 5000
+    num_samples = 4000
     df = pd.DataFrame({
         '위도': np.random.uniform(-60, 60, num_samples),
         '경도': np.random.uniform(-180, 180, num_samples),
@@ -181,7 +207,6 @@ if os.path.exists(df_path):
 else:
     df = load_sample_data()
 
-# K-Means 클러스터링 고도화
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 X = df[FEATURES]
@@ -189,11 +214,9 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 model = KMeans(n_clusters=3, random_state=42, n_init=10)
 df["cluster"] = model.fit_predict(X_scaled)
-
 df = df.dropna(subset=["cluster", "위도", "경도"])
 df["cluster"] = df["cluster"].astype(int)
 
-# 위험 등급 연산 및 인덱스 매핑
 agg = df.groupby("cluster")[FEATURES].mean()
 score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규모"].min() + 1e-5) * 0.5 + 
          (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
@@ -210,60 +233,57 @@ def haversine(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
-# 🪐 오로라 성간 감성의 5기 티니핑 스토리 멘트로 교체
+# 🌸 파스텔 오로라 감성의 시즌 5 티니핑 정감 보이스 가이드문
 RISK_STYLE = {
-    "고위험": ("fact-high", "🪐🚨 [스타핑 비상! 고위험]", "초롱핑 궤도 추적기에 적색 신호 포착! 얕고 강력한 지진 오우라가 밤하늘을 흔들고 있어츄! 대피 배리어가 필요해!"),
-    "중위험": ("fact-mid", "💫⚡ [초롱핑 감지! 중위험]", "초롱핑 돋보기 스캔 통과! 지진파 스펙트럼이 은하 너머 아주 깊은 곳에서 요동쳐 충격이 분산되고 있어!"),
-    "저위험": ("fact-low", "✨💚 [반짝안전! 오로라존]", "오로라 커튼이 춤추는 영롱하고 안전한 구역이야츄! 지동 주파수가 아주 예쁘고 고르게 흐르고 있어!"),
-    "판단보류": ("fact-none", "🌌💫 [고요구역! 판단보류]", "슈팅스타팩트 레이더에 잡히지 않는 태고의 고요가 깃든 신비로운 성간 암흑 구역이야!"),
+    "고위험": ("fact-high", "🌸🚨 [스타핑 레이더 대기경보]", "초롱핑의 궤도 반경에 흔들림 에너지가 집중 감지되었어츄! 스타 더스트 방어벽을 활성화해야 해!"),
+    "중위험": ("fact-mid", "🌟⚡ [초롱핑 스캔! 아우라 전파]", "지파 에너지가 확인되었지만 심해성 성간 흐름이라 지상 버블 실드가 안전하게 흡수해 주는 중이야!"),
+    "저위험": ("fact-low", "✨💚 [반짝안전! 파스텔 가든]", "포근하고 평화로운 별빛 가루가 은은하게 도는 안심 성층권 구역이야츄~ 자유롭게 탐사해도 좋아!"),
+    "판단보류": ("fact-none", "🌌💫 [안개지대! 은하 외곽]", "슈팅스타팩트 미답사 은하 구역으로, 고요하고 신비로운 무중력 상태가 유지되는 곳이야!"),
 }
 
 # ═════════════════════════════════════════════════════════════
-# 사이드바 제어 패널
+# 사이드바 콘솔 (스타 다이얼 분기)
 # ═════════════════════════════════════════════════════════════
-st.sidebar.markdown("### 🛰️ 오로라 주파수 다이얼")
-st.sidebar.caption("Season 5 Space Radar Device")
-K_NEIGHBORS = st.sidebar.slider("🔮 동기화할 오로라 노드 (k)", 5, 50, 25)
+st.sidebar.markdown("### 🪐 오로라 싱크 팩트 조절")
+K_NEIGHBORS = st.sidebar.slider("🔮 주파수 매핑 별빛 노드 (k)", 5, 50, 20)
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     """
-    <div style="background: rgba(138, 43, 226, 0.1); padding: 15px; border-radius: 15px; border: 1px solid #00ffcc;">
-        <span style="color: #00ffcc; font-weight: bold;">🌌 오로라 궤도 관측 대원</span><br>
-        <small style="color: #e0ffff;">• 초롱핑 (오로라 홀로그램 투사)</small><br>
-        <small style="color: #ba55d3;">• 스타핑 (우주 좌표 안착 지원)</small><br>
-        <small style="color: #ff69b4;">• 하츄핑 (하트 링크 동기화)</small>
+    <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid rgba(200, 180, 255, 0.2);">
+        <small style="color: #cbdced;"><b>🛰️ 궤도 안착 동기화 요원</b><br>
+        • 초롱핑 (오로라 스크린 동기화)<br>
+        • 스타핑 (매직 스타 게이트 개방)<br>
+        • 하츄핑 (러블리 우주 파동 매칭)</small>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# ═════════════════════════════════════════════════════════════
-# 메인 스크린 헤더
-# ═════════════════════════════════════════════════════════════
+# 헤더 엠블럼 출력
 st.markdown(
     """
     <div class="shooting-star-header">
-        <h1>✨ CATCH! TEENIEPING: AURORA SPACE FACT ✨</h1>
-        <p>초롱핑의 입체 홀로그램 장치 개방! 오로라 주파수 궤도를 동기화하여 지진파 성단을 정밀 추적합니다츄!</p>
+        <h1>✨ CATCH! TEENIEPING: SHOOTING STAR AURA FACT ✨</h1>
+        <p>파스텔빛 은하수 오로라 주파수를 맞춰 지정한 성간 좌표의 흔들림을 아기자기하게 포착합니다츄!</p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 # ═════════════════════════════════════════════════════════════
-# 입력창 레이아웃
+# 좌표 입력 패드
 # ═════════════════════════════════════════════════════════════
-st.subheader("🎯 오로라 레이더 크로스헤어 좌표 조준")
-c1, c2 = st.columns(2)
-with c1:
-    lat = st.number_input("🔮 팩트 타겟 위도 (Latitude)", -90.0, 90.0, 36.5, 0.1, format="%.4f")
-with c2:
-    lon = st.number_input("🌌 팩트 타겟 경도 (Longitude)", -180.0, 180.0, 127.5, 0.1, format="%.4f")
+st.subheader("🎯 슈팅스타 레이더 오로라 크로스헤어 타겟점")
+cx, cy = st.columns(2)
+with cx:
+    lat = st.number_input("🌸 타겟 위도 좌표 (Latitude)", -90.0, 90.0, 36.5, 0.1, format="%.4f")
+with cy:
+    lon = st.number_input("🌌 타겟 경도 좌표 (Longitude)", -180.0, 180.0, 127.5, 0.1, format="%.4f")
 
 # ═════════════════════════════════════════════════════════════
-# 마법 레이더 스캔 시작 (오류 유발 코드 완벽 제거 및 정상 구동)
+# 팩트 메인 구동 프로세스
 # ═════════════════════════════════════════════════════════════
-if st.button("🪐 슈팅스타 팩트 오픈! 오로라 스캔 스타트!!", type="primary", use_container_width=True):
+if st.button("🪐 슈팅스타 팩트 오픈! 파스텔 오로라 스캔 스타트!!", type="primary", use_container_width=True):
     dist = haversine(lat, lon, df["위도"].values, df["경도"].values)
     order = np.argsort(dist)[:K_NEIGHBORS]
     near = df.iloc[order].copy()
@@ -277,7 +297,7 @@ if st.button("🪐 슈팅스타 팩트 오픈! 오로라 스캔 스타트!!", ty
         for idx, c_val in zip(order, near["cluster"].values):
             try:
                 c_key = int(float(c_val))
-                cw[c_key] = cw.get(c_key, 0.0) + 1.0 / (dist[idx] + 30.0)
+                cw[c_key] = cw.get(c_key, 0.0) + 1.0 / (dist[idx] + 25.0)
             except: continue
         
         if cw:
@@ -290,142 +310,151 @@ if st.button("🪐 슈팅스타 팩트 오픈! 오로라 스캔 스타트!!", ty
     css_cls, emoji, desc = RISK_STYLE[grade]
     st.divider()
 
-    # 슈팅스타 레이더 매직 스크린 디스플레이
+    # 상단 요약 피드 대시보드
     r1, r2 = st.columns([1.1, 1.3])
     with r1:
-        sub = f"🌌 오로라 스타 궤도 {dom_cluster}번 성단 연결 완료" if dom_cluster is not None else "🪐 미확인 딥스페이스 매트릭스"
-        # ⚠️ 존재하지 않던 오타 매개변수 'Total_Formatter=True' 제거로 오류 근본적 해결!
+        sub = f"🌌 오로라 스타 궤도 {dom_cluster}번 채널 안착" if dom_cluster is not None else "🪐 미탐사 안개 성운 영역"
         st.markdown(
             f'<div class="risk-badge {css_cls}">{emoji}<br>'
-            f'<span style="font-size:15px; font-weight:bold; letter-spacing:1px; opacity:0.95;">{sub}</span></div>',
+            f'<span style="font-size:14px; font-weight:700; letter-spacing:0.5px; opacity:0.9;">{sub}</span></div>',
             unsafe_allow_html=True
         )
     with r2:
         st.markdown(
-            f'<div class="fact-card"><b>🛰️ 초롱핑의 오로라 정밀 홀로그램 피드</b><br><span style="color:#d1f7ff;">{desc}</span><br><br>'
-            f'<b>📍 조준 은하 좌표</b> : 위도 {lat:.4f}°, 경도 {lon:.4f}°<br>'
-            f'<b>☄️ 최접근 에너지 코어 궤도</b> : {nearest_km:,.1f} km</div>',
+            f'<div class="fact-card"><b>🛰️ 초롱핑의 오로라 정밀 홀로그램 피드</b><br><span style="color:#e2f0fd;">{desc}</span><br><br>'
+            f'<b>📍 조준 팩트 성간 은하축</b> : 위도 {lat:.4f}°, 경도 {lon:.4f}°<br>'
+            f'<b>☄️ 가장 가까운 지동 진원 에너지 코어</b> : {nearest_km:,.1f} km</div>',
             unsafe_allow_html=True,
         )
 
-    # 마법 계기판 메트릭 배치
+    # 파스텔 스크린 계기판 메트릭스
     st.markdown("<br>", unsafe_allow_html=True)
     m1, m2, m3 = st.columns(3)
-    m1.metric("🔮 레이더 주파수 규모", f"Mag {near['규모'].mean():.2f}")
-    m2.metric("🌌 오로라 관측 진원깊이", f"{near['진원깊이'].mean():.0f} km")
-    m3.metric("✨ 초롱핑 동기화 영향도", f"{near['영향도'].mean():.1f} 핑")
+    m1.metric("🔮 은하 오로라 평균 규모", f"Mag {near['규모'].mean():.2f}")
+    m2.metric("🌌 내부 레이더 진원깊이", f"{near['진원깊이'].mean():.0f} km")
+    m3.metric("✨ 초롱핑 궤도 동기화 영향도", f"{near['영향도'].mean():.1f} 핑")
 
     # ═════════════════════════════════════════════════════════════
-    # 🛰️ 3D 입체 우주 홀로그램 가상 돔 (Pydeck 사이언 오로라 커스텀)
+    # 🛰️ 기믹 하이라이트: 슈팅스타팩트 하드웨어 프레임 안에 3D 지형 투사
     # ═════════════════════════════════════════════════════════════
     st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("🔮 슈팅스타팩트 3D 입체 오로라 스크린 (초롱핑 홀로그램 뷰)")
+    st.subheader("🔮 슈팅스타팩트 홀로그램 LCD 입체 투사 기믹 스크린")
     
-    show = df.sample(min(4500, len(df)), random_state=42).copy()
+    # 팩트 완구 형태의 기기 하우징 CSS 틀 배치
+    st.markdown('<div class="star-fact-hardware-case"><div class="star-fact-lcd-screen">', unsafe_allow_html=True)
     
-    # 핑크 비중을 낮추고 민트/아쿠아/네온옐로우 오로라 빛 컬러 매핑 선언
-    COLOR_MAP = {"고위험": [255, 69, 0, 220], "중위험": [255, 215, 0, 220], "저위험": [0, 255, 204, 220]}
-    show['color'] = show['cluster'].map(lambda c: COLOR_MAP.get(grade_map.get(int(c)), [138, 43, 226, 170]))
+    show = df.sample(min(3500, len(df)), random_state=42).copy()
+    
+    # 튀지 않고 은은하게 어우러지는 파스텔톤 오로라 컬러 매핑 (연핑크, 크림옐로우, 부드러운 민트아쿠아)
+    PASTEL_COLOR_MAP = {
+        "고위험": [255, 160, 180, 180], 
+        "중위험": [255, 220, 140, 180], 
+        "저위험": [140, 240, 220, 180]
+    }
+    show['color'] = show['cluster'].map(lambda c: PASTEL_COLOR_MAP.get(grade_map.get(int(c)), [190, 180, 240, 130]))
 
-    # 타겟 포인트 주위로 퍼져나가는 '네온 그린 오로라 홀로그램 파동' 링 레이어
-    ring_data = []
-    for r_factor in [0.6, 1.2, 2.2]:
-        ring_data.append({"lon": lon, "lat": lat, "radius": r_factor * 150000})
+    # 조준점 원형 파동 링 레이어 셋
+    ring_data = [{"lon": lon, "lat": lat, "radius": rf * 160000} for rf in [0.7, 1.4, 2.3]]
     ring_df = pd.DataFrame(ring_data)
     target_df = pd.DataFrame([{"lon": lon, "lat": lat}])
 
     layers = [
-        # 1. 성간 지진 데이터 플롯 (별가루)
+        # 성간 지진 분산도 (파스텔 별가루)
         pdk.Layer(
             'ScatterplotLayer',
             data=show,
             get_position='[경도, 위도]',
             get_color='color',
-            get_radius=50000,
+            get_radius=55000,
             pickable=True
         ),
-        # 2. 초롱핑의 홀로그램 파동 테두리 레이어
+        # 초롱핑의 파스텔 라이트 파동 테두리 링
         pdk.Layer(
             'ScatterplotLayer',
             data=ring_df,
             get_position='[lon, lat]',
             get_radius='radius',
-            get_color=[0, 255, 204, 60],
+            get_color=[160, 230, 255, 60],
             filled=False,
             stroked=True,
             line_width_min_pixels=2
         ),
-        # 3. 팩트 골드 스타 크로스헤어 조준점
+        # 팩트 조준 크로스헤어 (골드 파스텔 스타 코어 포인트)
         pdk.Layer(
             'ScatterplotLayer',
             data=target_df,
             get_position='[lon, lat]',
-            get_color=[255, 255, 0, 255],
-            get_radius=220000,
+            get_color=[255, 235, 150, 255],
+            get_radius=240000,
             filled=True,
             stroked=True,
-            line_width_min_pixels=4,
-            get_line_color=[138, 43, 226, 255] # 퍼플 오로라 오라 테두리
+            line_width_min_pixels=3,
+            get_line_color=[240, 160, 220, 255]
         )
     ]
 
-    # SF 우주선 콕핏 뷰 시점 각도 (Pitch=60, Bearing=20)
+    # 슈팅스타팩트 기기 화면을 바라보는 각도에 맞춰 깊이감 있는 3D 뷰 시점 선언
     view_state = pdk.ViewState(
         latitude=lat,
         longitude=lon,
-        zoom=2.8,
-        pitch=60,
-        bearing=20
+        zoom=2.6,
+        pitch=45,
+        bearing=10
     )
 
-    # 딥 다크 내비게이션 스타일로 변경하여 완전히 우주선 스크린 홀로그램 느낌 극대화
+    # 팩트 안에서 지도가 떠오른듯한 분위기용 테마
     r = pdk.Deck(
         layers=layers,
         initial_view_state=view_state,
-        map_style='mapbox://styles/mapbox/navigation-night-v1',
-        tooltip={"text": "티니핑 성간 코드: {cluster}\n위도: {위도}°\n경도: {경도}°"}
+        map_style='mapbox://styles/mapbox/dark-v10',
+        tooltip={"text": "성간 주파수 등급: {cluster}\n위도: {위도}°\n경도: {경도}°"}
     )
     st.pydeck_chart(r)
+    
+    # 팩트 하드웨어 프레임 케이스 닫아주기
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
     # ═════════════════════════════════════════════════════════════
-    # 2D 매직스타 레이더 주파수 도표 (Matplotlib 딥 사이언 커스텀)
+    # 2D 매직스타 레이더 주파수 도표 (실시간 다운로드 한글 폰트 적용 완료)
     # ═════════════════════════════════════════════════════════════
     st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("📊 오로라 레이더 주파수 분석 트랙")
+    st.subheader("📊 초롱핑의 오로라 주파수 추적 궤도 도표")
     
-    fig, ax = plt.subplots(figsize=(12, 5), facecolor='#050014')
-    ax.set_facecolor('#0d002d')
+    fig, ax = plt.subplots(figsize=(12, 4.8), facecolor='#161032')
+    ax.set_facecolor('#1a1c4b')
     
-    # 폰트 깨짐 예방 및 글자 오로라 네온 톤 커스텀
-    ax.tick_params(colors='#d1f7ff', labelsize=10)
-    ax.xaxis.label.set_color('#00ffcc')
-    ax.yaxis.label.set_color('#00ffcc')
-    ax.title.set_color('#00ffcc')
+    # 다운받은 안심 구글 한글 폰트를 축과 타이틀에 직접 투입하여 깨짐 방지 구현 완료!
+    ax.tick_params(colors='#bce9ff', labelsize=10)
+    ax.xaxis.label.set_color('#bda2ff')
+    ax.yaxis.label.set_color('#bda2ff')
+    ax.title.set_color('#e8dbff')
 
-    HEX_MAP = {"고위험": "#ff4500", "중위험": "#ffd700", "저위험": "#00ffcc"}
+    HEX_MAP = {"고위험": "#ff9ebb", "중위험": "#ffcf87", "저위험": "#a6ffea"}
     for c in sorted(df["cluster"].unique()):
         s_ = df[df["cluster"] == c]
         g_name = grade_map.get(int(c), "저위험")
-        ax.scatter(s_["경도"], s_["위도"], s=9, alpha=0.6,
-                   color=HEX_MAP.get(g_name, "#8a2be2"),
-                   label=f"오로라 노드 {c} ({g_name})")
+        ax.scatter(s_["경도"], s_["위도"], s=10, alpha=0.55,
+                   color=HEX_MAP.get(g_name, "#b8b2d6"),
+                   label=f"성간 오로라 노드 {c} ({g_name})")
                    
-    # 황금 별 모양 타겟 센터 마킹 
-    ax.scatter(lon, lat, c="#ffff00", s=380, marker="*",
-                edgecolors="#00ffcc", linewidths=2.5, zorder=10, label="팩트 조준점")
+    # 파스텔 조준점 마킹 별표
+    ax.scatter(lon, lat, c="#fff2b2", s=380, marker="*",
+                edgecolors="#d476aa", linewidths=2.5, zorder=12, label="팩트 조준점")
                
     ax.set_xlim(-180, 180)
     ax.set_ylim(-90, 90)
-    ax.set_xlabel("스페이스 경도 (Longitude)", fontsize=11, fontweight='bold')
-    ax.set_ylabel("스페이스 위도 (Latitude)", fontsize=11, fontweight='bold')
-    ax.set_title("✨ 슈팅스타 레이더 오로라 주파수 도표 ✨", fontsize=14, fontweight='bold', pad=15)
+    
+    # 한글 폰트 명시 지정 (안심 2차 장치)
+    ax.set_xlabel("스페이스 경도 축 (Longitude)", fontsize=11, fontweight='bold', fontfamily=KOREAN_FONT)
+    ax.set_ylabel("스페이스 위도 축 (Latitude)", fontsize=11, fontweight='bold', fontfamily=KOREAN_FONT)
+    ax.set_title("✨ 슈팅스타 레이더 파스텔 오로라 주파수 도표 ✨", fontsize=14, fontweight='bold', pad=15, fontfamily=KOREAN_FONT)
     
     legend = ax.legend(fontsize=10, loc="lower left")
-    plt.setp(legend.get_texts(), color='white')
-    legend.get_frame().set_facecolor('#050014')
-    legend.get_frame().set_edgecolor('#8a2be2')
-    legend.get_frame().set_linewidth(1.5)
+    plt.setp(legend.get_texts(), color='white', fontfamily=KOREAN_FONT)
+    legend.get_frame().set_facecolor('#161032')
+    legend.get_frame().set_edgecolor('#bda2ff')
+    legend.get_frame().set_linewidth(1.2)
     
-    ax.grid(color='#8a2be2', alpha=0.2, linestyle=':')
+    ax.grid(color='#bda2ff', alpha=0.12, linestyle='--')
     st.pyplot(fig)
     plt.close(fig)
