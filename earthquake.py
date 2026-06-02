@@ -10,7 +10,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트 리얼 완구 퀄리티] 결이 살아있는 3D 입체 깃털 날개 CSS 마스터링
+# 🎨 [슈팅스타팩트 원본 사진 기반] 완벽한 카툰 요정 날개 및 마법 별빛 이펙트 세팅
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -23,10 +23,34 @@ st.markdown(
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #a6d5ff 0%, #d5f1fe 25%, #fbe3f1 50%, #fbe8d5 75%, #ffffff 100%) !important;
         color: #3b3a57 !important;
+        overflow-x: hidden;
     }
+    
+    /* ✨ [부활] 하늘에서 끊임없이 떨어지는 몽환적인 별빛 효과 */
+    .stAppViewContainer::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 999;
+        background-image: 
+            radial-gradient(circle at 20% 10%, #fff 1px, transparent 2px),
+            radial-gradient(circle at 75% 20%, #fff 2px, transparent 3px),
+            radial-gradient(circle at 50% 40%, #ffb6c1 1.5px, transparent 2px),
+            radial-gradient(circle at 30% 60%, #fff 2px, transparent 3px),
+            radial-gradient(circle at 80% 80%, #e0f2fe 2px, transparent 4px);
+        background-size: 550px 550px;
+        animation: starDustFall 12s linear infinite;
+        opacity: 0.8;
+    }
+    @keyframes starDustFall {
+        0% { background-position: 0px 0px; }
+        100% { background-position: 100px 550px; }
+    }
+
     .stMainBlockContainer {
-        background: radial-gradient(circle at 15% 25%, rgba(138, 43, 226, 0.35) 0%, transparent 60%),
-                    radial-gradient(circle at 85% 75%, rgba(255, 105, 180, 0.35) 0%, transparent 60%);
+        background: radial-gradient(circle at 15% 25%, rgba(138, 43, 226, 0.25) 0%, transparent 60%),
+                    radial-gradient(circle at 85% 75%, rgba(255, 105, 180, 0.25) 0%, transparent 60%);
         padding: 30px 60px !important;
     }
 
@@ -42,12 +66,12 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
 
-    /* 🔮 슈팅스타팩트 마법 조립 기단 무대 */
+    /* 🔮 슈팅스타팩트 마법 거치대 무대 (크기 확대 대응) */
     .shooting-star-factory-stage {
         position: relative;
-        width: 440px;
-        height: 440px;
-        margin: 40px auto;
+        width: 500px;
+        height: 500px;
+        margin: 20px auto;
     }
 
     /* ⭐ 대형 황금색 입체 별 마크 스탠드 베이스 */
@@ -56,82 +80,62 @@ st.markdown(
         width: 100%;
         height: 100%;
         background: linear-gradient(135deg, #ffe082 0%, #facc15 40%, #eab308 100%);
-        clip-path: polygon(50% 0%, 62% 35%, 98% 35%, 69% 57%, 80% 91%, 50% 72%, 20% 91%, 31% 57%, 2% 35%, 38% 35%);
+        clip-path: polygon(50% 0%, 63% 35%, 98% 35%, 70% 57%, 81% 91%, 50% 74%, 19% 91%, 30% 57%, 2% 35%, 37% 35%);
         box-shadow: 0 15px 35px rgba(234, 179, 8, 0.3);
         border: 4px solid #ffffff;
         z-index: 1; 
     }
 
-    /* 👼 결이 살아있는 입체 마법 깃털 조형 파츠 세트 */
-    .wing-group-left {
-        position: absolute;
-        left: -85px;
-        top: 110px;
-        width: 180px;
-        height: 160px;
-        z-index: 2;
-        filter: drop-shadow(-8px 12px 18px rgba(236, 72, 153, 0.5));
+    /* 👼 [대개조] 원본 완구 사진과 일치하는 풍성한 카툰 요정의 날개 구현 */
+    .fairy-wing-container-left {
+        position: absolute; left: -85px; top: 140px; width: 220px; height: 180px; z-index: 2;
+        filter: drop-shadow(-10px 14px 20px rgba(244, 114, 182, 0.6));
     }
-    .feather-l1 {
-        position: absolute; top: 0; right: 0; width: 140px; height: 70px;
-        background: linear-gradient(-60deg, #ffffff 30%, #e0f2fe 70%, #bae6fd 100%);
-        border: 3px solid #ffffff;
-        border-radius: 150px 10px 120px 80px;
-        transform: rotate(-15deg);
+    .fairy-wing-container-right {
+        position: absolute; right: -125px; top: 140px; width: 220px; height: 180px; z-index: 2;
+        filter: drop-shadow(10px 14px 20px rgba(244, 114, 182, 0.6));
     }
-    .feather-l2 {
-        position: absolute; top: 35px; right: 15px; width: 130px; height: 65px;
-        background: linear-gradient(-60deg, #ffffff 30%, #fbcfe8 70%, #f472b6 100%);
-        border: 3px solid #ffffff;
-        border-radius: 140px 10px 110px 70px;
-        transform: rotate(-5deg);
+    
+    /* 겹겹이 풍성하게 쌓이는 카툰 깃털 묘사 */
+    .cartoon-feather-l1 {
+        position: absolute; top: 0; right: 20px; width: 160px; height: 60px;
+        background: linear-gradient(-45deg, #ffffff, #e0f2fe, #bae6fd);
+        border: 3px solid #fff; border-radius: 160px 20px 140px 60px; transform: rotate(-10deg);
     }
-    .feather-l3 {
-        position: absolute; top: 70px; right: 35px; width: 110px; height: 60px;
-        background: linear-gradient(-60deg, #ffffff 20%, #e0f2fe 60%, #7dd3fc 100%);
-        border: 3px solid #ffffff;
-        border-radius: 120px 10px 90px 60px;
-        transform: rotate(8deg);
+    .cartoon-feather-l2 {
+        position: absolute; top: 35px; right: 40px; width: 140px; height: 55px;
+        background: linear-gradient(-45deg, #ffffff, #fbcfe8, #f472b6);
+        border: 3px solid #fff; border-radius: 140px 20px 120px 55px; transform: rotate(-2deg);
+    }
+    .cartoon-feather-l3 {
+        position: absolute; top: 70px; right: 60px; width: 120px; height: 50px;
+        background: linear-gradient(-45deg, #ffffff, #e0f2fe, #7dd3fc);
+        border: 3px solid #fff; border-radius: 120px 20px 100px 50px; transform: rotate(8deg);
     }
 
-    .wing-group-right {
-        position: absolute;
-        right: -85px;
-        top: 110px;
-        width: 180px;
-        height: 160px;
-        z-index: 2;
-        filter: drop-shadow(8px 12px 18px rgba(236, 72, 153, 0.5));
+    .cartoon-feather-r1 {
+        position: absolute; top: 0; left: 20px; width: 160px; height: 60px;
+        background: linear-gradient(45deg, #ffffff, #e0f2fe, #bae6fd);
+        border: 3px solid #fff; border-radius: 20px 160px 60px 140px; transform: rotate(10deg);
     }
-    .feather-r1 {
-        position: absolute; top: 0; left: 0; width: 140px; height: 70px;
-        background: linear-gradient(60deg, #ffffff 30%, #e0f2fe 70%, #bae6fd 100%);
-        border: 3px solid #ffffff;
-        border-radius: 10px 150px 80px 120px;
-        transform: rotate(15deg);
+    .cartoon-feather-r2 {
+        position: absolute; top: 35px; left: 40px; width: 140px; height: 55px;
+        background: linear-gradient(45deg, #ffffff, #fbcfe8, #f472b6);
+        border: 3px solid #fff; border-radius: 20px 140px 55px 120px; transform: rotate(2deg);
     }
-    .feather-r2 {
-        position: absolute; top: 35px; left: 15px; width: 130px; height: 65px;
-        background: linear-gradient(60deg, #ffffff 30%, #fbcfe8 70%, #f472b6 100%);
-        border: 3px solid #ffffff;
-        border-radius: 10px 140px 70px 110px;
-        transform: rotate(5deg);
-    }
-    .feather-r3 {
-        position: absolute; top: 70px; left: 35px; width: 110px; height: 60px;
-        background: linear-gradient(60deg, #ffffff 20%, #e0f2fe 60%, #7dd3fc 100%);
-        border: 3px solid #ffffff;
-        border-radius: 10px 120px 60px 90px;
-        transform: rotate(-8deg);
+    .cartoon-feather-r3 {
+        position: absolute; top: 70px; left: 60px; width: 120px; height: 50px;
+        background: linear-gradient(45deg, #ffffff, #e0f2fe, #7dd3fc);
+        border: 3px solid #fff; border-radius: 20px 120px 50px 100px; transform: rotate(-8deg);
     }
 
-    /* 💖 외부 오로라 분홍색 서클 아우라 하우징 */
+    /* 💖 외부 오로라 분홍색 하우징 원형 실드 (팩트 본체) */
     .fact-pink-heart-shield {
         position: absolute;
-        left: 45px;
-        top: 45px;
-        width: 350px;
-        height: 350px;
+        left: 50px;
+        top: 50px;
+        width: 400px;
+        height: 400px;
         background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fbcfe8 45%, #ec4899 85%, #be185d 100%);
         border-radius: 50%;
         border: 10px solid #ffffff;
@@ -139,34 +143,19 @@ st.markdown(
         z-index: 3;
     }
 
-    /* 🎀 본체 맨 위를 장식하는 핑크 리본 크라운 완장 마크 */
-    .fact-top-crown-ribbon {
-        position: absolute;
-        left: 50%;
-        top: -10px;
-        transform: translateX(-50%);
-        width: 140px;
-        height: 55px;
-        background: linear-gradient(180deg, #f472b6 0%, #db2777 100%);
-        border: 4px solid #ffffff;
-        border-radius: 28px;
-        z-index: 12;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-    }
-
-    /* 🔒 내부 홀로그램이 표출되는 글래스 원형 코어 안착 영역 */
+    /* 🔒 [확대 개조] 대형 투명 홀로그램 구체가 표출되는 센터 돔 영역 */
     .map-inside-binder {
         position: absolute;
-        left: 85px;
-        top: 85px;
-        width: 270px;
-        height: 270px;
+        left: 80px;
+        top: 80px;
+        width: 340px;
+        height: 340px;
         border-radius: 50% !important;
         overflow: hidden !important;
         z-index: 5;
         border: 6px solid #fef08a;
-        box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.6);
-        background: radial-gradient(circle, #1e1b4b 0%, #090521 100%);
+        box-shadow: inset 0 0 40px rgba(0, 242, 254, 0.7);
+        background: radial-gradient(circle, #120e3d 0%, #050214 100%);
     }
 
     .photo-bottom-card {
@@ -204,10 +193,10 @@ def load_pure_quake_data():
     np.random.seed(42)
     num_samples = 2000
     df = pd.DataFrame({
-        '위도': np.random.uniform(-50, 50, num_samples),
-        '경도': np.random.uniform(-160, 160, num_samples),
-        '규모': np.random.uniform(1.5, 7.0, num_samples),
-        '진원깊이': np.random.uniform(5, 550, num_samples),
+        '위도': np.random.uniform(-60, 60, num_samples),
+        '경도': np.random.uniform(-180, 180, num_samples),
+        '규모': np.random.uniform(1.5, 7.5, num_samples),
+        '진원깊이': np.random.uniform(5, 600, num_samples),
         '영향도': np.random.uniform(10, 100, num_samples),
     })
     return df
@@ -251,7 +240,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 제어 보드 디자인 노드 전개
+# 메인 콘솔 UI 레이아웃 빌드
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -286,30 +275,28 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    col_left_stage, col_right_graph = st.columns([1, 1])
+    col_left_stage, col_right_graph = st.columns([1.1, 0.9])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 내부 3D 홀로그램 투사")
+        st.write("#### 🔮 3D 홀로그램 투사 (마우스 드래그 회전 가능)")
         
-        # [핵심 수리] 깨진 문자열 노출을 막기 위해 하나의 마크다운 블록 내부에서 완벽 차폐 결합 진행
+        # [해결] 꼬이던 핑크 블록과 이상한 문자열을 완벽히 제거하고 일체형 쉘로 정리
         html_shell = f"""
         <div class="shooting-star-factory-stage">
             <div class="star-gold-pedestal-base"></div>
-            <div class="wing-group-left">
-                <div class="feather-l1"></div><div class="feather-l2"></div><div class="feather-l3"></div>
+            <div class="fairy-wing-container-left">
+                <div class="cartoon-feather-l1"></div><div class="cartoon-feather-l2"></div><div class="cartoon-feather-l3"></div>
             </div>
-            <div class="wing-group-right">
-                <div class="feather-r1"></div><div class="feather-r2"></div><div class="feather-r3"></div>
+            <div class="fairy-wing-container-right">
+                <div class="cartoon-feather-r1"></div><div class="cartoon-feather-r2"></div><div class="cartoon-feather-r3"></div>
             </div>
             <div class="fact-pink-heart-shield"></div>
-            <div class="fact-top-crown-ribbon"></div>
             <div class="map-inside-binder" id="inject-target"></div>
         </div>
         """
         st.markdown(html_shell, unsafe_allow_html=True)
         
-        # 3D 렌더링용 데이터 바인딩
-        show_df = df.sample(min(450, len(df)), random_state=42)
+        show_df = df.sample(min(500, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
         points_js = []
@@ -318,7 +305,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             points_js.append(f"{{lat: {row['위도']}, lon: {row['경도']}, color: '{HEX_MAP[g_name]}', size: {row['규모']}}}")
         points_js_str = ",\n".join(points_js)
 
-        # 🪐 [해결] 투명 배경 가시성 극대화 + 선명한 형광 비비드 사이언 블루 격자선 주입 개조
+        # 🪐 [크기 업그레이드 & 선명도 대폭 강화] 340px 대형 투명 인터랙티브 홀로그램 스크립트
         three_js_code = f"""
         <!DOCTYPE html>
         <html>
@@ -334,21 +321,21 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             <script>
                 const canvas = document.getElementById('globeCanvas');
                 const ctx = canvas.getContext('2d');
-                let width = canvas.width = 270;
-                let height = canvas.height = 270;
+                let width = canvas.width = 340;
+                let height = canvas.height = 340;
                 
-                let rotationX = 0.3;
+                let rotationX = 0.4;
                 let rotationY = {np.radians(lon)};
                 let isDragging = false;
                 let previousMousePosition = {{ x: 0, y: 0 }};
                 
                 const points = [{points_js_str}];
-                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 8 }};
+                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 9 }};
 
                 function project(lat, lon) {{
                     let rLat = (lat * Math.PI) / 180;
                     let rLon = (lon * Math.PI) / 180 + rotationY;
-                    let radius = 95;
+                    let radius = 125; // 더 시원하게 확대된 반지름 지름비
                     let x = radius * Math.cos(rLat) * Math.sin(rLon);
                     let y = radius * Math.sin(rLat);
                     let z = radius * Math.cos(rLat) * Math.cos(rLon);
@@ -363,10 +350,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, width, height);
                     
-                    // ✨ [색상 리뉴얼] 훨씬 진하고 선명해진 형광 사이언 블루(#00f2fe) 3D 레이더 격자 라인
-                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.45)';
-                    ctx.lineWidth = 1.2;
-                    for (let l = -60; l <= 60; l += 30) {{
+                    // ✨ [색상 보정] 선명하고 진해진 고밀도 네온 비비드 사이언 블루 격자
+                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.6)';
+                    ctx.lineWidth = 1.4;
+                    for (let l = -60; l <= 60; l += 20) {{
                         ctx.beginPath();
                         for (let lng = -180; lng <= 180; lng += 10) {{
                             let p = project(l, lng);
@@ -382,16 +369,16 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     
                     allPoints.forEach(p => {{
                         let proj = p._proj;
-                        if (proj.depth > -35) {{ 
-                            let alpha = Math.max(0.3, (proj.depth + 95) / 190);
+                        if (proj.depth > -40) {{ 
+                            let alpha = Math.max(0.4, (proj.depth + 125) / 250);
                             ctx.beginPath();
                             if (p === targetPoint) {{
-                                ctx.arc(proj.x, proj.y, 8, 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, 9, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 15;
-                                ctx.shadowColor = '#db2777';
+                                ctx.shadowBlur = 18;
+                                ctx.shadowColor = '#ec4899';
                             }} else {{
-                                ctx.arc(proj.x, proj.y, Math.max(2.5, p.size * 0.9), 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, Math.max(3.0, p.size * 1.1), 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color;
                                 ctx.shadowBlur = 0;
                             }}
@@ -412,8 +399,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     if (!isDragging) return;
                     let deltaX = e.clientX - previousMousePosition.x;
                     let deltaY = e.clientY - previousMousePosition.y;
-                    rotationY += deltaX * 0.007;
-                    rotationX += deltaY * 0.007;
+                    rotationY += deltaX * 0.006;
+                    rotationX += deltaY * 0.006;
                     rotationX = Math.max(-Math.PI/3, Math.min(Math.PI/3, rotationX));
                     previousMousePosition = {{ x: e.clientX, y: e.clientY }};
                 }});
@@ -423,29 +410,28 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </body>
         </html>
         """
-        # 절대 이탈하지 않는 안착식 인젝션 바인딩 실행
+        # 정밀 안착 바인딩 스페이싱 계산 적용
         st.markdown(
             """
             <style>
             .map-inside-binder iframe { pointer-events: auto !important; }
             </style>
-            <div style="position: absolute; transform: translate(170px, -355px); z-index: 99;">
+            <div style="position: absolute; transform: translate(80px, -425px); z-index: 99;">
             """, unsafe_allow_html=True
         )
-        components.html(three_js_code, height=270, width=270, scrolling=False)
+        components.html(three_js_code, height=340, width=340, scrolling=False)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col_right_graph:
-        st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
+        st.write("#### 📊 글로벌 지진 분포 매트릭스")
         
-        # 🔒 [대변신] 파이썬 Matplotlib을 과감히 버리고 브라우저 한글 엔진 기반의 2D 격자 맵 컴포넌트 신설
-        # 이를 통해 한글 깨짐 및 영어 표기 문제를 100% 원천 해결했습니다.
+        # 🗺️ [대변신 해결] 좁게 갇힌 축소 지도가 아니라, 전 세계 전체 범위(-180~180, -90~90) 스케일로 투사
+        # 요청하신 제목도 깨끗하게 날려버렸습니다!
         chart_points = []
-        for c in sorted(df["cluster"].unique()):
-            sub_set = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))].sample(min(150, len(df)), replace=True)
-            g_name = grade_map.get(int(c), "저위험군")
-            for _, r in sub_set.iterrows():
-                chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{HEX_MAP[g_name]}', label: '{g_name}'}}")
+        sub_set_all = df.sample(min(400, len(df)), random_state=42)
+        for _, r in sub_set_all.iterrows():
+            g_name = grade_map.get(int(r['cluster']), "저위험군")
+            chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{HEX_MAP[g_name]}'}}")
         chart_points_str = ",\n".join(chart_points)
 
         canvas_chart_html = f"""
@@ -453,56 +439,54 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         <html>
         <head>
             <style>
-                body {{ font-family: 'Pretendard', sans-serif; margin: 0; background: rgba(255,255,255,0.7); border-radius: 20px; padding: 15px; }}
-                #chartTitle {{ font-weight: 900; color: #1e1b4b; font-size: 16px; margin-bottom: 10px; text-align: center; }}
+                body {{ font-family: 'Pretendard', sans-serif; margin: 0; background: rgba(255,255,255,0.75); border-radius: 20px; padding: 20px; }}
             </style>
         </head>
         <body>
-            <div id="chartTitle">지진 위험군 클러스터 매트릭스 (한글 100% 보장 매핑)</div>
             <canvas id="chartCanvas" width="460" height="380"></canvas>
             <script>
                 const cvs = document.getElementById('chartCanvas');
                 const ctx = cvs.getContext('2d');
                 const pts = [{chart_points_str}];
                 
-                // 그리드 그리기
+                // 🗺️ 전 세계 표준 그리드 망 구축
                 ctx.strokeStyle = '#cbd5e1';
                 ctx.lineWidth = 0.5;
-                for(let i=40; i<460; i+=50) {{
-                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 350); ctx.stroke();
+                for(let i=40; i<=460; i+=60) {{
+                    ctx.beginPath(); ctx.moveTo(i, 10); ctx.lineTo(i, 330); ctx.stroke();
                 }}
-                for(let j=30; j<350; j+=40) {{
+                for(let j=10; j<=330; j+=40) {{
                     ctx.beginPath(); ctx.moveTo(40, j); ctx.lineTo(460, j); ctx.stroke();
                 }}
                 
-                // 축 레이블 출력 (웹 폰트로 한글 직접 인쇄)
-                ctx.fillStyle = '#334155';
-                ctx.font = 'bold 12px Pretendard';
-                ctx.fillText("타겟 경도 (Longitude)", 200, 375);
+                // 100% 안 깨지는 순수 브라우저 웹폰트 한글 축 표기
+                ctx.fillStyle = '#4c4475';
+                ctx.font = 'bold 13px Pretendard';
+                ctx.fillText("전세계 경도 범위 (-180° ~ 180°)", 160, 365);
                 
                 ctx.save();
                 ctx.translate(15, 200);
                 ctx.rotate(-Math.PI/2);
-                ctx.fillText("타겟 위도 (Latitude)", 0, 0);
+                ctx.fillText("전세계 위도 범위 (-90° ~ 90°)", -80, 0);
                 ctx.restore();
                 
-                // 포인트 투사
+                // 포인트 전역 매핑
                 pts.forEach(p => {{
-                    let cx = 40 + ((p.x - ({lon-30})) / 60) * 400;
-                    let cy = 340 - ((p.y - ({lat-30})) / 60) * 310;
-                    if(cx >= 40 && cx <= 460 && cy >= 0 && cy <= 340) {{
+                    let cx = 40 + ((p.x + 180) / 360) * 400;
+                    let cy = 330 - ((p.y + 90) / 180) * 320;
+                    if(cx >= 40 && cx <= 460 && cy >= 10 && cy <= 330) {{
                         ctx.beginPath();
-                        ctx.arc(cx, cy, 4, 0, 2*Math.PI);
+                        ctx.arc(cx, cy, 3.5, 0, 2*Math.PI);
                         ctx.fillStyle = p.color;
                         ctx.fill();
                     }}
                 }});
                 
-                // 센터 타겟 마크 보석 별 그리기
-                let tx = 40 + (30 / 60) * 400;
-                let ty = 340 - (30 / 60) * 310;
+                // 현재 설정한 타겟 크로스헤어를 지도 위에 대형 보석 별로 실시간 마킹
+                let tx = 40 + (({lon} + 180) / 360) * 400;
+                let ty = 330 - (({lat} + 90) / 180) * 320;
                 ctx.beginPath();
-                ctx.arc(tx, ty, 10, 0, 2*Math.PI);
+                ctx.arc(tx, ty, 9, 0, 2*Math.PI);
                 ctx.fillStyle = '#ffffff';
                 ctx.strokeStyle = '#db2777';
                 ctx.lineWidth = 3;
@@ -511,7 +495,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </body>
         </html>
         """
-        components.html(canvas_chart_html, height=430, scrolling=False)
+        components.html(canvas_chart_html, height=410, scrolling=False)
 
     tag_cls = "tag-high" if final_grade == "고위험군" else ("tag-mid" if final_grade == "중위험군" else "tag-low")
     
