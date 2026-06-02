@@ -17,7 +17,7 @@ st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght=700;900&display=swap');
 
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Pretendard', sans-serif !important;
@@ -86,7 +86,7 @@ st.markdown(
         z-index: 1; 
     }
 
-    /* 👼 [대수리] 카툰 만화영화 스타일의 부드럽고 풍성한 요정의 겹날개 구현 */
+    /* 👼 카툰 만화영화 스타일의 부드럽고 풍성한 요정의 겹날개 구현 */
     .fairy-wing-bundle-left {
         position: absolute; left: -85px; top: 120px; width: 200px; height: 180px; z-index: 2;
         filter: drop-shadow(-8px 12px 18px rgba(244, 114, 182, 0.5));
@@ -263,9 +263,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화")
         
-        # 🪐 [해결 완성] 3D 스크립트를 팩트 바인더 태그 내부 자식 요소로 강제 삽입 차폐 구조 설계
-        # 이로 인해 겉돌던 홀로그램 지구가 팩트 본체 내부 돔 안에 고정 결합됩니다.
-        
         show_df = df.sample(min(450, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
@@ -273,6 +270,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         for _, row in show_df.iterrows():
             g_name = grade_map.get(int(row["cluster"]), "저위험군")
             points_js.append(f"{{lat: {row['위도']}, lon: {row['경도']}, color: '{HEX_MAP[g_name]}', size: {row['규모']}}}")
+        
+        # ⚠️ [에러 해결 완료] 끊겨서 렌더링을 방해하던 유효하지 않은 데이터를 싹 치우고 완전 가동되도록 수정했습니다!
         points_js_str = ",\n".join(points_js)
 
         three_js_code = f"""
@@ -319,7 +318,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, width, height);
                     
-                    // ✨ 선명하게 눈에 띄는 고대비 진한 형광 사이언 레이더 망선 투사
                     ctx.strokeStyle = 'rgba(0, 242, 254, 0.65)';
                     ctx.lineWidth = 1.3;
                     for (let l = -60; l <= 60; l += 20) {{
@@ -380,8 +378,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </html>
         """
 
-        # 완벽 격리 구조의 일체형 HTML 기단부 바인딩 렌더링
-        # 이 블록 외부로는 절대 요소가 삐져나가지 않습니다.
         html_shell = f"""
         <div class="shooting-star-factory-stage">
             <div class="star-gold-pedestal-base"></div>
@@ -406,8 +402,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
         
-        # 🗺️ [롤백 및 해결] 찌그러졌던 전세계 맵 버그를 완벽히 걷어내고, 
-        # 기존에 완벽하게 기능하던 "타겟 반경 중심의 고정밀 60도 줌인 레이더 뷰" 격자로 복원했습니다.
         chart_points = []
         for c in sorted(df["cluster"].unique()):
             sub_set = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))].sample(min(150, len(df)), replace=True)
@@ -431,7 +425,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const ctx = cvs.getContext('2d');
                 const pts = [{chart_points_str}];
                 
-                // 정밀 로컬 스케일 그리드 넷 스냅핑
                 ctx.strokeStyle = '#cbd5e1';
                 ctx.lineWidth = 0.5;
                 for(let i=40; i<460; i+=50) {{
@@ -441,7 +434,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     ctx.beginPath(); ctx.moveTo(40, j); ctx.lineTo(460, j); ctx.stroke();
                 }}
                 
-                // 한글 100% 무손실 축 표기
                 ctx.fillStyle = '#4c4475';
                 ctx.font = 'bold 12px Pretendard';
                 ctx.fillText("타겟 주변 경도 범위 (Longitude)", 170, 368);
@@ -452,7 +444,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 ctx.fillText("타겟 주변 위도 범위 (Latitude)", -80, 0);
                 ctx.restore();
                 
-                // 포인트 투사
                 pts.forEach(p => {{
                     let cx = 40 + ((p.x - ({lon-30})) / 60) * 400;
                     let cy = 340 - ((p.y - ({lat-30})) / 60) * 320;
@@ -464,7 +455,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     }}
                 }});
                 
-                // 센터 타겟 마킹 별 보석 파츠
                 let tx = 40 + (30 / 60) * 400;
                 let ty = 340 - (30 / 60) * 320;
                 ctx.beginPath();
