@@ -38,7 +38,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 슈팅스타팩트 실물 저격 디테일 가미 완벽 무드 CSS
+# 🎨 슈팅스타팩트 실물 구현 및 3D 지도 완벽 봉인 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -47,7 +47,7 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@700;900&display=swap');
 
-    /* 🌌 전체 파스텔 오로라 우주 공간 배경 무드 복원 */
+    /* 🌌 전체 파스텔 오로라 우주 공간 배경 */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #b4c5e7 0%, #eef2fa 30%, #e3daf7 65%, #fbcfe8 100%) !important;
@@ -104,7 +104,7 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 25px; font-weight: 900; color: #433d6a; }
 
-    /* 🔮 [구조 혁신] 지도가 팩트 돔 내부에 완벽히 귀속되도록 설계된 컨테이너 */
+    /* 🔮 슈팅스타팩트 입체 레이아웃 스테이지 */
     .hologram-absolute-universe {
         position: relative;
         width: 440px;
@@ -112,7 +112,7 @@ st.markdown(
         margin: 20px auto;
     }
 
-    /* 🌟 실물 사진의 거대한 노란색 입체 별 모양 거치대 베이스 */
+    /* 🌟 완구의 상징인 하단 대형 입체 노란색 별 모양 스탠드 */
     .star-gold-pedestal {
         position: absolute;
         width: 100%;
@@ -125,7 +125,7 @@ st.markdown(
         z-index: 1;
     }
 
-    /* 💖 분홍색 하트 리본 마크와 화려한 윙이 조합된 팩트 본체 */
+    /* 💖 핑크 리본과 메인 하트 링 프레임 */
     .fact-aurora-shield-frame {
         position: absolute;
         left: 45px;
@@ -139,7 +139,7 @@ st.markdown(
         z-index: 3;
     }
 
-    /* 👼 완구 특유의 입체 천사 금빛 날개 디테일 */
+    /* 👼 양옆으로 멋지게 날아오른 날개 파츠 디테일 */
     .fact-wing-part-left {
         position: absolute;
         left: -15px;
@@ -167,7 +167,7 @@ st.markdown(
         z-index: 2;
     }
 
-    /* 🎀 상단 중앙의 시그니처 핑크 하트 리본 장식 */
+    /* 🎀 실물 상단의 핫핑크 하트 리본 마크 */
     .fact-crown-ribbon {
         position: absolute;
         left: 50%;
@@ -182,7 +182,7 @@ st.markdown(
         box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
 
-    /* 🔮 [초강력 락킹] 지도가 밖으로 탈출하는 것을 원천 봉쇄하는 원형 바인더 구체 */
+    /* 🗺️ 지도가 사각형 바깥으로 새어 나가는 것을 완전히 막아버리는 고정 구체 캡슐 */
     .map-inside-hologram-binder {
         position: absolute;
         left: 85px;
@@ -190,12 +190,20 @@ st.markdown(
         width: 270px;
         height: 270px;
         border-radius: 50% !important;
-        overflow: hidden !important; /* 바깥 사각형을 완전히 잘라버림 */
+        overflow: hidden !important;
+        mask-image: radial-gradient(circle, white 100%, transparent 100%);
+        -webkit-mask-image: radial-gradient(circle, white 100%, transparent 100%);
         z-index: 5;
-        background: #0b0726; /* 우주의 검고 깊은 베이스 */
+        background: #0b0726;
+    }
+    
+    /* Pydeck 자체의 사각형 레이아웃 요소 강제 격리 */
+    .map-inside-hologram-binder > div {
+        border-radius: 50% !important;
+        overflow: hidden !important;
     }
 
-    /* 🛡️ 지도 위에 씌워져 오로라 투사 효과를 극대화하는 유리막 커버 (마우스 드래그 관통) */
+    /* 🛡️ 지도 위에 겹쳐 팩트 유리 렌즈 느낌을 주는 오로라 스키드 필터 (드래그 관통) */
     .fact-glass-lens-mask {
         position: absolute;
         left: 85px;
@@ -203,13 +211,12 @@ st.markdown(
         width: 270px;
         height: 270px;
         border-radius: 50%;
-        /* 완구 고유의 내부 골드 서클 링과 오로라 홀로그램 무드 결합 */
         background: radial-gradient(circle 122px at center, transparent 96%, #ffffff 100%),
                     radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(128, 222, 234, 0.15) 50%, rgba(192, 132, 252, 0.25) 100%);
         border: 5px solid #fef08a; 
         box-shadow: inset 0 0 25px rgba(0, 242, 254, 0.5), 0 0 20px rgba(232, 121, 249, 0.4);
-        z-index: 7; /* 지도 레이어보다 높은 위치에 강제 고정 */
-        pointer-events: none; /* 마우스 클릭 및 드래그가 하단 지도로 그대로 투과됨 */
+        z-index: 7;
+        pointer-events: none;
     }
 
     .photo-bottom-card {
@@ -289,7 +296,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 레이아웃 노드 가로 정렬 배치
+# 메인 레이아웃 노드 배치
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -324,13 +331,12 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    # 5:5 완벽 분할 균형배치
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 내부 3D 홀로그램 투사")
         
-        # 디자인 요소 레이어 구조화 시작
+        # [수정 완료] 타이핑 오타 수정을 마치고 안정적으로 프레임 빌드
         st.markdown(
             f"""
             <div class="hologram-absolute-universe">
@@ -371,11 +377,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 get_radius=390000,
                 stroked=True,
                 line_width_min_pixels=3,
-                get_line_color=[21db, 39, 119, 255]
+                get_line_color=[219, 39, 119, 255] # <-- 21db 오타 완벽 제거 및 정상 수치 반영 완료!
             )
         ]
         
-        # 팩트 내부 우주 느낌을 살리기 위해 매핑 스타일을 다크 모드로 튜닝
         r = pdk.Deck(
             layers=layers,
             initial_view_state=pdk.ViewState(latitude=lat, longitude=lon, zoom=1.4, pitch=40, bearing=0),
