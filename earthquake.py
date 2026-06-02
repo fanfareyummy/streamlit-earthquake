@@ -3,42 +3,19 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
+import streamlit.components.v1 as components
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
-# ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 방지: 서버 환경 내 존재하는 모든 한글 폰트 자동 추적 장치
-# ═════════════════════════════════════════════════════════════
-def init_linux_korean_font():
-    # 리눅스/윈도우/맥 가용한 한글 폰트 경로 목록 탐색
-    font_paths = [
-        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
-        "/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf",
-        "/usr/share/fonts/noto/NotoSansCJK-Regular.ttc",
-        "C:/Windows/Fonts/malgun.ttf",
-        "/System/Library/Fonts/AppleSDGothicNeo.ttc"
-    ]
-    for path in font_paths:
-        if os.path.exists(path):
-            try:
-                fm.fontManager.addfont(path)
-                prop = fm.FontProperties(fname=path)
-                plt.rcParams['font.family'] = prop.get_name()
-                return
-            except:
-                pass
-    # 최후의 보루
-    plt.rcParams['font.family'] = 'sans-serif'
-
-init_linux_korean_font()
+# Matplotlib (우측 2D 그래프용) 한글 깨짐 방지 범용 세팅
+plt.rcParams['font.family'] = ['sans-serif']
 plt.rcParams['axes.unicode_minus'] = False
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 슈팅스타팩트 고퀄리티 디자인 리뉴얼 & 세련된 요정 날개 CSS
+# 🎨 슈팅스타팩트 리얼 마스터피스: 고퀄리티 깃털 날개 및 투명 홀로그램 프레임
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -70,7 +47,7 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
 
-    /* 🔮 슈팅스타팩트 입체 무대 스탠드 */
+    /* 🔮 슈팅스타팩트 본체 무대 */
     .shooting-star-factory-stage {
         position: relative;
         width: 440px;
@@ -78,7 +55,7 @@ st.markdown(
         margin: 40px auto;
     }
 
-    /* ⭐ 대형 황금색 입체 별 모양 거치대 베이스 */
+    /* ⭐ 대형 황금색 입체 별 모양 거치대 */
     .star-gold-pedestal-base {
         position: absolute;
         width: 100%;
@@ -90,62 +67,52 @@ st.markdown(
         z-index: 1; 
     }
 
-    /* 👼 [퀄리티 업그레이드] 세련되고 날렵한 입체 천사 날개 - 왼쪽 */
+    /* 👼 [초고퀄리티 변신] 오로라 펄 레이어드가 들어간 세련된 요정의 천사 날개 - LEFT */
     .fact-wing-left-part {
         position: absolute;
-        left: -65px;
-        top: 140px;
-        width: 150px;
-        height: 100px;
-        background: linear-gradient(-60deg, #ffffff 10%, #e0f2fe 50%, #bae6fd 80%, #7dd3fc 100%);
-        border: 3.5px solid #ffffff;
-        /* 끝을 날렵하게 뺀 고퀄리티 깃털 컷팅 쉐이프 */
-        clip-path: polygon(100% 80%, 80% 95%, 45% 100%, 15% 90%, 0% 65%, 5% 40%, 25% 15%, 60% 0%, 80% 15%, 85% 40%);
-        transform: rotate(-18deg);
-        filter: drop-shadow(-10px 12px 15px rgba(0,0,0,0.22));
+        left: -85px;
+        top: 130px;
+        width: 170px;
+        height: 130px;
+        background: linear-gradient(-45deg, #ffffff 20%, #e0f2fe 50%, #fbcfe8 80%, #f472b6 100%);
+        border: 4px solid #ffffff;
+        /* 여러 장의 깃털이 겹친 고급스러운 형상 컷팅 */
+        clip-path: polygon(100% 70%, 85% 85%, 65% 95%, 40% 100%, 15% 95%, 0% 80%, 2% 55%, 12% 30%, 35% 10%, 70% 0%, 90% 15%, 85% 45%);
+        transform: rotate(-15deg);
+        filter: drop-shadow(-8px 12px 16px rgba(236, 72, 153, 0.45));
         z-index: 2;
     }
-    /* 날개 안쪽 디테일 레이어 */
-    .fact-wing-left-part::after {
+    /* 깃털 디테일 선 구현 */
+    .fact-wing-left-part::before {
         content: '';
         position: absolute;
-        width: 70%;
-        height: 60%;
-        left: 20%;
-        top: 20%;
-        background: linear-gradient(-60deg, rgba(255,255,255,0.8), rgba(244,114,182,0.3));
-        clip-path: polygon(100% 80%, 80% 95%, 45% 100%, 15% 90%, 0% 65%, 5% 40%);
-        border-radius: 50%;
+        width: 100%; height: 100%;
+        border-radius: inherit;
+        background: radial-gradient(circle at 80% 50%, transparent 50%, rgba(255, 255, 255, 0.8) 53%, transparent 56%);
     }
 
-    /* 👼 [퀄리티 업그레이드] 세련되고 날렵한 입체 천사 날개 - 오른쪽 */
+    /* 👼 [초고퀄리티 변신] 오로라 펄 레이어드가 들어간 세련된 요정의 천사 날개 - RIGHT */
     .fact-wing-right-part {
         position: absolute;
-        right: -65px;
-        top: 140px;
-        width: 150px;
-        height: 100px;
-        background: linear-gradient(60deg, #ffffff 10%, #e0f2fe 50%, #bae6fd 80%, #7dd3fc 100%);
-        border: 3.5px solid #ffffff;
-        /* 대칭 컷팅 프로파일 */
-        clip-path: polygon(0% 80%, 20% 95%, 55% 100%, 85% 90%, 100% 65%, 95% 40%, 75% 15%, 40% 0%, 20% 15%, 15% 40%);
+        right: -85px;
+        top: 130px;
+        width: 170px;
+        height: 130px;
+        background: linear-gradient(45deg, #ffffff 20%, #e0f2fe 50%, #fbcfe8 80%, #f472b6 100%);
+        border: 4px solid #ffffff;
+        clip-path: polygon(0% 70%, 15% 85%, 35% 95%, 60% 100%, 85% 95%, 100% 80%, 98% 55%, 88% 30%, 65% 10%, 30% 0%, 10% 15%, 15% 45%);
         transform: rotate(18deg);
-        filter: drop-shadow(10px 12px 15px rgba(0,0,0,0.22));
+        filter: drop-shadow(8px 12px 16px rgba(236, 72, 153, 0.45));
         z-index: 2;
     }
-    .fact-wing-right-part::after {
+    .fact-wing-right-part::before {
         content: '';
         position: absolute;
-        width: 70%;
-        height: 60%;
-        right: 20%;
-        top: 20%;
-        background: linear-gradient(60deg, rgba(255,255,255,0.8), rgba(244,114,182,0.3));
-        clip-path: polygon(0% 80%, 20% 95%, 55% 100%, 85% 90%, 100% 65%, 95% 40%);
-        border-radius: 50%;
+        width: 100%; height: 100%;
+        background: radial-gradient(circle at 20% 50%, transparent 50%, rgba(255, 255, 255, 0.8) 53%, transparent 56%);
     }
 
-    /* 💖 외부 핫핑크 본체 아우라 서클 실드 */
+    /* 💖 외부 마법 아우라 분홍색 서클 실드 */
     .fact-pink-heart-shield {
         position: absolute;
         left: 45px;
@@ -159,22 +126,22 @@ st.markdown(
         z-index: 3;
     }
 
-    /* 🎀 본체 정상부의 럭셔리 크라운 하트 리본 완장 */
+    /* 🎀 본체 상단 럭셔리 골드/핑크 리본 크라운 마크 */
     .fact-top-crown-ribbon {
         position: absolute;
         left: 50%;
-        top: -8px;
+        top: -10px;
         transform: translateX(-50%);
-        width: 135px;
-        height: 52px;
+        width: 140px;
+        height: 55px;
         background: linear-gradient(180deg, #f472b6 0%, #db2777 100%);
         border: 4px solid #ffffff;
-        border-radius: 25px;
+        border-radius: 28px;
         z-index: 12;
         box-shadow: 0 6px 14px rgba(0,0,0,0.2);
     }
 
-    /* 🔒 지도를 원형 컴팩트 내부에 절대 도망치지 못하게 끼워 가두는 서클 안착 홀더 */
+    /* 🔒 [배경 투명화 완료] 완벽한 오로라 스페이스 테두리 링 안착 돔 */
     .map-inside-binder {
         position: absolute;
         left: 85px;
@@ -184,9 +151,9 @@ st.markdown(
         border-radius: 50% !important;
         overflow: hidden !important;
         z-index: 5;
-        border: 6px solid #fef08a; /* 팩트 고유의 내부 골드 주얼리 라운드 림 */
-        box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.6);
-        background: #090521;
+        border: 6px solid #fef08a; /* 내부 주얼리 링 테두리 */
+        box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.6);
+        background: radial-gradient(circle, #1e1b4b 0%, #090521 100%);
     }
 
     .photo-bottom-card {
@@ -217,7 +184,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [데이터 무결성 검증 및 로딩 처리 부]
+# 📊 [데이터 처리 모듈 및 AI 군집화 분석]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -243,13 +210,11 @@ if os.path.exists(df_path):
                 df = temp_df
                 df_loaded = True
                 break
-        except:
-            continue
+        except: continue
 
 if not df_loaded:
     df = load_pure_quake_data()
 
-# 지진 AI 군집 분류 실행
 X = df[FEATURES]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -273,7 +238,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 레이아웃 노드 전개 및 랜더링 부
+# 프론트엔드 노드 출력 부
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -326,34 +291,137 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             unsafe_allow_html=True
         )
         
-        # 🔒 [완벽 수리] Matplotlib 3D 오로라 지구본 가동 및 색상 ValueError 제거
-        fig_3d, ax_3d = plt.subplots(figsize=(3.5, 3.5), subplot_kw={'projection': '3d'}, facecolor='none')
-        fig_3d.patch.set_alpha(0.0)
-        ax_3d.set_facecolor('#090521')
-        
-        # 지구본 기하학 격자 계산 및 올바른 정수 튜플 컬러 적용 완료!
-        u = np.linspace(0, 2 * np.pi, 20)
-        v = np.linspace(0, np.pi, 20)
-        xs = 180 * np.outer(np.cos(u), np.sin(v))
-        ys = 90 * np.outer(np.sin(u), np.sin(v))
-        zs = 90 * np.outer(np.ones(np.size(u)), np.cos(v))
-        ax_3d.plot_wireframe(xs, ys, zs, color=(0.0, 0.95, 1.0, 0.2), linewidth=0.5)
-
+        # 데이터 전달 가공
+        show_df = df.sample(min(400, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
-        show_df = df.sample(min(500, len(df)), random_state=42)
         
-        for c in sorted(show_df["cluster"].unique()):
-            sub = show_df[show_df["cluster"] == c]
-            g_name = grade_map.get(int(c), "저위험군")
-            ax_3d.scatter(sub["경도"], sub["위도"], sub["규모"]*5, color=HEX_MAP.get(g_name, "#ffffff"), alpha=0.7)
-            
-        ax_3d.scatter(lon, lat, 120, color="#ffffff", marker="*", edgecolors="#db2777", linewidths=1.5, zorder=20)
-        
-        ax_3d.view_init(elev=25, azim=int(lon)-30)
-        ax_3d.axis('off')
-        
-        st.pyplot(fig_3d)
-        plt.close(fig_3d)
+        points_js = []
+        for _, row in show_df.iterrows():
+            g_name = grade_map.get(int(row["cluster"]), "저위험군")
+            points_js.append(f"{{lat: {row['위도']}, lon: {row['경도']}, color: '{HEX_MAP[g_name]}', size: {row['규모']}}}")
+        points_js_str = ",\n".join(points_js)
+
+        # 🪐 [대혁신 치트키] 투명 배경 + 마우스로 드래그하여 직접 회전할 수 있는 HTML5 Canvas 3D 인터랙티브 홀로그램
+        three_js_code = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ margin: 0; overflow: hidden; background: transparent; font-family: sans-serif; }}
+                canvas {{ background: transparent; width: 100vw; height: 100vh; cursor: grab; }}
+                canvas:active {{ cursor: grabbing; }}
+            </style>
+        </head>
+        <body>
+            <canvas id="globeCanvas"></canvas>
+            <script>
+                const canvas = document.getElementById('globeCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                let width = canvas.width = 270;
+                let height = canvas.height = 270;
+                
+                let rotationX = 0.3;
+                let rotationY = {np.radians(lon)};
+                let isDragging = false;
+                let previousMousePosition = {{ x: 0, y: 0 }};
+                
+                const points = [
+                    {points_js_str}
+                ];
+                
+                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 8 }};
+
+                function project(lat, lon) {{
+                    let rLat = (lat * Math.PI) / 180;
+                    let rLon = (lon * Math.PI) / 180 + rotationY;
+                    
+                    let radius = 95;
+                    let x = radius * Math.cos(rLat) * Math.sin(rLon);
+                    let y = radius * Math.sin(rLat);
+                    let z = radius * Math.cos(rLat) * Math.cos(rLon);
+                    
+                    // X축 회전 적용
+                    let cosX = Math.cos(rotationX);
+                    let sinX = Math.sin(rotationX);
+                    let ry = y * cosX - z * sinX;
+                    let rz = y * sinX + z * cosX;
+                    
+                    return {{ x: x + width/2, y: -ry + height/2, depth: rz }};
+                }}
+
+                function draw() {{
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    // 1. 와이어프레임 가상 위경도 가이드라인 투명 패스 드로잉
+                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.12)';
+                    ctx.lineWidth = 0.7;
+                    for (let l = -60; l <= 60; l += 30) {{
+                        ctx.beginPath();
+                        for (let lng = -180; lng <= 180; lng += 10) {{
+                            let p = project(l, lng);
+                            if (lng === -180) ctx.moveTo(p.x, p.y);
+                            else ctx.lineTo(p.x, p.y);
+                        }}
+                        ctx.stroke();
+                    }}
+                    
+                    // 2. 깊이(z-index) 기준으로 정렬하여 앞쪽에 있는 포인트 우선 입체 렌더링
+                    let allPoints = [...points, targetPoint];
+                    allPoints.forEach(p => p._proj = project(p.lat, p.lon));
+                    allPoints.sort((a, b) => b._proj.depth - a._proj.depth);
+                    
+                    allPoints.forEach(p => {{
+                        let proj = p._proj;
+                        if (proj.depth > -30) {{ // 앞면 영역 가시화
+                            let alpha = Math.max(0.2, (proj.depth + 95) / 190);
+                            ctx.beginPath();
+                            if (p === targetPoint) {{
+                                // 타겟 포인트는 하얀색 빛나는 크로스헤어 서클로 특수 묘사
+                                ctx.arc(proj.x, proj.y, 7, 0, 2 * Math.PI);
+                                ctx.fillStyle = '#ffffff';
+                                ctx.shadowBlur = 10;
+                                ctx.shadowColor = '#db2777';
+                            }} else {{
+                                ctx.arc(proj.x, proj.y, Math.max(2, p.size * 0.8), 0, 2 * Math.PI);
+                                ctx.fillStyle = p.color;
+                                ctx.shadowBlur = 0;
+                            }}
+                            ctx.globalAlpha = alpha;
+                            ctx.fill();
+                        }}
+                    }});
+                    ctx.globalAlpha = 1.0;
+                    ctx.shadowBlur = 0;
+                    requestAnimationFrame(draw);
+                }}
+
+                // 드래그 마우스 인터랙션 이벤트 바인딩
+                window.addEventListener('mousedown', e => {{
+                    isDragging = true;
+                    previousMousePosition = {{ x: e.clientX, y: e.clientY }};
+                }});
+                
+                window.addEventListener('mousemove', e => {{
+                    if (!isDragging) return;
+                    let deltaX = e.clientX - previousMousePosition.x;
+                    let deltaY = e.clientY - previousMousePosition.y;
+                    
+                    rotationY += deltaX * 0.007;
+                    rotationX += deltaY * 0.007;
+                    rotationX = Math.max(-Math.PI/3, Math.min(Math.PI/3, rotationX));
+                    
+                    previousMousePosition = {{ x: e.clientX, y: e.clientY }};
+                }});
+                
+                window.addEventListener('mouseup', () => isDragging = false);
+                
+                draw();
+            </script>
+        </body>
+        </html>
+        """
+        components.html(three_js_code, height=270, width=270, scroller=False)
         
         st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -375,10 +443,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#cbd5e1', linestyle='-', linewidth=0.8)
         
-        # 한글 가독성 강화 타이틀링
-        ax.set_xlabel("타겟 경도", fontsize=11, color="#334155", fontweight='bold')
-        ax.set_ylabel("타겟 위도", fontsize=11, color="#334155", fontweight='bold')
-        ax.set_title("지진 관측 데이터 매트릭스", fontsize=12, color="#1e1b4b", fontweight='bold')
+        # 폰트를 직접 지정하지 않는 범용 방식으로 인자 전달 변경 완료
+        ax.set_xlabel("Target Longitude", fontsize=11, color="#334155", fontweight='bold')
+        ax.set_ylabel("Target Latitude", fontsize=11, color="#334155", fontweight='bold')
+        ax.set_title("Earthquake Risk Cluster Matrix", fontsize=12, color="#1e1b4b", fontweight='bold')
         
         ax.legend(loc='upper right', framealpha=0.7)
         ax.tick_params(colors='#334155', labelsize=9)
