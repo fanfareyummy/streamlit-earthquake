@@ -17,16 +17,13 @@ def load_korean_font_secure():
     os.makedirs(font_dir, exist_ok=True)
     font_path = os.path.join(font_dir, "NanumGothic.ttf")
     
-    # 서버에 폰트 파일이 없으면 안전한 오픈소스 URL에서 다운로드
     if not os.path.exists(font_path):
         url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
         try:
             urllib.request.urlretrieve(url, font_path)
         except Exception:
-            # 다운로드 실패 시 시스템 디폴트 폰트 속성 안전하게 반환
             return fm.FontProperties()
             
-    # Matplotlib에 물리적으로 폰트 등록
     try:
         fm.fontManager.addfont(font_path)
         prop = fm.FontProperties(fname=font_path)
@@ -41,7 +38,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 샌드박스를 우회하는 돔-마스크 기법 및 하얀 별빛 CSS
+# 🔮 [복원] 파스텔 우주 배경 + 별빛 효과 + 슈팅스타팩트 실물 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -50,164 +47,185 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@700;900&display=swap');
 
-    html, body, [data-testid="stAppViewContainer"] {{
+    /* 🪐 파스텔톤 우주 오로라 배경 무드 복원 */
+    html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #b4c5e7 0%, #eef2fa 40%, #e3daf7 70%, #f7e3ef 100%) !important;
         color: #333355 !important;
-    }}
-    .stMainBlockContainer {{
-        background: radial-gradient(circle at 15% 25%, rgba(195, 175, 255, 0.35) 0%, transparent 50%),
-                    radial-gradient(circle at 85% 75%, rgba(255, 195, 220, 0.35) 0%, transparent 50%);
+    }
+    
+    .stMainBlockContainer {
+        background: radial-gradient(circle at 15% 25%, rgba(195, 175, 255, 0.4) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 75%, rgba(255, 195, 220, 0.4) 0%, transparent 50%);
         padding: 20px 40px !important;
         position: relative;
-    }}
+    }
 
-    /* 🌟 상단에서 무수히 떨어지는 하얀색 별빛 효과 */
-    .stMainBlockContainer::before {{
+    /* 🌟 위에서 은은하게 떨어지는 하얀색 별빛 애니메이션 복원 */
+    .stMainBlockContainer::before {
         content: "★";
         position: absolute;
         top: -20px;
-        left: 30%;
-        color: rgba(255, 255, 255, 0.85);
+        left: 25%;
+        color: rgba(255, 255, 255, 0.9);
         font-size: 14px;
-        animation: fallStars 6s infinite linear;
+        animation: fallStars 7s infinite linear;
         pointer-events: none;
         z-index: 99;
-    }}
-    .stMainBlockContainer::after {{
-        content: "✧  ✨  *";
+    }
+    .stMainBlockContainer::after {
+        content: "✧  ✨  * ✦";
         position: absolute;
         top: -30px;
-        left: 75%;
-        color: rgba(255, 255, 255, 0.9);
+        left: 65%;
+        color: rgba(255, 255, 255, 0.85);
         font-size: 16px;
-        letter-spacing: 150px;
-        animation: fallStars 8s infinite linear;
+        letter-spacing: 130px;
+        animation: fallStars 10s infinite linear;
         pointer-events: none;
         z-index: 99;
-    }}
-    @keyframes fallStars {{
-        0% {{ transform: translateY(-20px) rotate(0deg); opacity: 0; }}
-        10% {{ opacity: 1; }}
-        90% {{ opacity: 1; }}
-        100% {{ transform: translateY(800px) rotate(360deg); opacity: 0; }}
-    }}
+    }
+    @keyframes fallStars {
+        0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        100% { transform: translateY(800px) rotate(360deg); opacity: 0; }
+    }
 
-    .photo-top-header {{
-        background: rgba(255, 255, 255, 0.6);
+    /* 상단 헤더 */
+    .photo-top-header {
+        background: rgba(255, 255, 255, 0.65);
         border: 2px solid rgba(255, 255, 255, 0.8);
         border-radius: 24px;
         padding: 18px 30px;
         text-align: center;
-        box-shadow: 0 10px 35px rgba(180, 185, 215, 0.15);
-        margin-bottom: 30px;
+        box-shadow: 0 10px 35px rgba(180, 185, 215, 0.2);
+        margin-bottom: 25px;
         backdrop-filter: blur(10px);
-    }}
-    .photo-top-header h1 {{ margin: 0; font-size: 25px; font-weight: 900; color: #433d6a; }}
+    }
+    .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #433d6a; keyframe-name: glow; }
 
-    .hologram-stage {{
+    /* 🔮 슈팅스타팩트 메인 스테이지 배치 구역 */
+    .hologram-outer-stage {
         position: relative;
         width: 100%;
         height: 420px;
-        margin-top: 10px;
-    }}
+        margin-bottom: 20px;
+    }
 
-    /* 🔮 슈팅스타팩트 본체 */
-    .star-fact-device-body {{
+    /* 💖 핵심: 슈팅스타팩트 기기 본체 완벽 입체화 */
+    .star-fact-device-body {
         position: absolute;
-        left: 5px;
-        bottom: 10px;
-        width: 290px;
-        height: 350px;
+        left: 10px;
+        bottom: 15px;
+        width: 300px;
+        height: 360px;
         background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f7e9f8 45%, #e9cbe0 80%, #d8aadc 100%);
-        border: 10px solid #ffffff;
-        border-radius: 85px 85px 70px 70px;
+        border: 9px solid #ffffff;
+        border-radius: 85px 85px 75px 75px;
         box-shadow: -15px 25px 40px rgba(100, 85, 135, 0.25), inset -4px -4px 15px rgba(0,0,0,0.05);
-        transform: perspective(1000px) rotateY(20deg) rotateX(6deg);
-        z-index: 2;
-    }}
-    .star-fact-inner-lcd {{
+        transform: perspective(1000px) rotateY(18deg) rotateX(5deg);
+        z-index: 10;
+    }
+    /* 팩트 왼쪽 노란 왕관 날개 장식 버튼 */
+    .star-fact-device-body::before {
+        content: "";
         position: absolute;
-        bottom: 22px;
-        left: 18px;
-        right: 18px;
+        left: -35px;
+        top: 25%;
+        width: 42px;
+        height: 120px;
+        background: linear-gradient(135deg, #ffe082 0%, #ffb300 50%, #ffa000 100%);
+        border-radius: 50px 12px 12px 50px;
+        border: 3px solid #ffffff;
+    }
+    /* 팩트 하단 미래지향적 내부 LCD 모니터 창 */
+    .star-fact-inner-lcd {
+        position: absolute;
+        bottom: 25px;
+        left: 20px;
+        right: 20px;
         height: 140px;
         background: linear-gradient(180deg, #0b081d 0%, #13184b 100%);
-        border: 3.5px solid #dca7ed;
+        border: 3px solid #dca7ed;
         border-radius: 16px;
-        box-shadow: inset 0 0 20px rgba(0,255,221,0.35);
+        box-shadow: inset 0 0 20px rgba(0,255,221,0.4);
         padding: 12px;
         color: #80deea;
         font-family: 'Orbit', sans-serif;
         font-size: 11px;
         line-height: 1.6;
-    }}
+    }
 
-    .hologram-light-beam {{
+    /* 모니터에서 뿜어져 나오는 신비로운 광선 효과 */
+    .hologram-light-beam {
         position: absolute;
-        left: 170px;
-        bottom: 100px;
-        width: 240px;
-        height: 280px;
+        left: 180px;
+        bottom: 120px;
+        width: 220px;
+        height: 260px;
         background: linear-gradient(45deg, rgba(220, 167, 237, 0.25) 0%, rgba(128, 222, 234, 0.08) 60%, transparent 100%);
-        clip-path: polygon(0% 100%, 40% 100%, 100% 0%, 50% 0%);
+        clip-path: polygon(0% 100%, 45% 100%, 100% 0%, 55% 0%);
         pointer-events: none;
-        z-index: 1;
-    }}
+        z-index: 5;
+    }
 
-    /* 📦 지도를 하단에 안전하게 배치하는 컨테이너 */
-    .map-under-binder {{
+    /* 🗺️ Pydeck 지도가 담기는 원형 바인더 구체 */
+    .map-under-binder {
         position: absolute;
-        left: 310px;
-        top: 10px;
+        left: 330px;
+        top: 15px;
         width: 380px;
         height: 380px;
-        z-index: 3;
-        animation: floatSphere 3.2s infinite alternate ease-in-out;
-    }}
+        z-index: 2;
+        animation: floatSphere 3.5s infinite alternate ease-in-out;
+    }
 
-    /* 🛡️ [Streamlit Cloud 전용 마스크 액자] 사각형 모서리를 배경색 오로라 판으로 완전히 덮어 은폐 */
-    .hologram-top-lens-frame {{
+    /* 🛡️ [고장 해결] 지도가 사각형으로 깨지는 걸 덮어서 막아버리는 최상위 오로라 프레임 렌즈 */
+    .hologram-top-lens-frame {
         position: absolute;
-        left: 310px;
-        top: 10px;
+        left: 330px;
+        top: 15px;
         width: 380px;
         height: 380px;
-        /* 중심부는 투명원, 외곽은 연보라-화이트 오로라 판으로 채워 사각형 모서리를 물리적으로 가림 */
         background: radial-gradient(circle 178px at center, transparent 98%, #ffffff 100%),
-                    radial-gradient(circle 182px at center, transparent 100%, rgba(238, 242, 250, 0.95) 100%);
+                    radial-gradient(circle 182px at center, transparent 100%, rgba(238, 242, 250, 0.98) 100%);
         border-radius: 50%;
-        box-shadow: 0 0 0 8px #ffffff, 0 0 30px rgba(128, 222, 234, 0.6), 0 0 50px rgba(220, 166, 245, 0.4);
-        z-index: 5; /* 지도(z-index 3) 위에 얹혀짐 */
-        pointer-events: none; /* 지도의 마우스 조작을 관통 방해하지 않음 */
-        animation: floatSphere 3.2s infinite alternate ease-in-out;
-    }}
+        box-shadow: 0 0 0 8px #ffffff, 0 0 35px rgba(128, 222, 234, 0.6), 0 0 55px rgba(220, 166, 245, 0.4);
+        z-index: 20; /* 지도 위에 배치되어 사각형 모서리를 원형으로 마스킹 */
+        pointer-events: none; /* 드래그 이벤트를 지도로 관통 */
+        animation: floatSphere 3.5s infinite alternate ease-in-out;
+    }
 
-    @keyframes floatSphere {{
-        0% {{ transform: translateY(0px); }}
-        100% {{ transform: translateY(-12px); }}
-    }}
+    @keyframes floatSphere {
+        0% { transform: translateY(0px); }
+        100% { transform: translateY(-14px); }
+    }
 
-    .photo-bottom-card {{
+    /* 하단 결과 피드 카드 */
+    .photo-bottom-card {
         background: rgba(255, 255, 255, 0.75);
         border: 2px solid #ffffff;
         border-radius: 22px;
         padding: 22px 28px;
         box-shadow: 0 12px 35px rgba(140, 145, 175, 0.12);
         margin-top: 25px;
-    }}
-    .danger-tag {{ font-weight: 900; padding: 4px 12px; border-radius: 12px; color: white; }}
-    .tag-high {{ background: #ff7675; }}
-    .tag-mid {{ background: #ffeaa7; color: #555; }}
-    .tag-low {{ background: #55efc4; color: #222; }}
+        backdrop-filter: blur(8px);
+    }
+    .danger-tag { font-weight: 900; padding: 4px 12px; border-radius: 12px; color: white; }
+    .tag-high { background: #ff7675; }
+    .tag-mid { background: #ffeaa7; color: #555; }
+    .tag-low { background: #55efc4; color: #222; }
 
-    .stButton>button {{
+    /* 대형 스캔 버튼 스타일 */
+    .stButton>button {
         background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%) !important;
         color: #4a4375 !important;
         font-weight: 900 !important;
         border-radius: 25px !important;
         border: 2px solid #ffffff !important;
-    }}
+        box-shadow: 0 5px 15px rgba(166, 193, 238, 0.4);
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -264,8 +282,8 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 레이아웃 구성
-# ═════════════════════════════════════════════════════════════
+# 레이아웃 배치 시작
+# ═════════════════════════════════════════════════════════
 st.markdown(
     """
     <div class="photo-top-header">
@@ -299,14 +317,16 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
+    # 가로 배치 영역 분할
     col_left_stage, col_right_graph = st.columns([7, 5])
     
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 원형 투사")
         
+        # 팩트 본체 및 도넛 마스크 렌즈 레이어를 한 묶음으로 묶어 깨짐 우회
         st.markdown(
             f"""
-            <div class="hologram-stage">
+            <div class="hologram-outer-stage">
                 <div class="star-fact-device-body">
                     <div class="star-fact-inner-lcd">
                         <span style="color:#e1f5fe; font-weight:900;">[STATION_ACTIVE]</span><br>
@@ -383,7 +403,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#dcdde1', linestyle='-', linewidth=0.8)
         
-        # ⚠️ 수동으로 주입된 웹폰트 적용
+        # 다운로드 완료된 폰트 직접 맵핑으로 에러/깨짐 동시 해결
         ax.set_xlabel("타겟 경도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
         ax.set_ylabel("타겟 위도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
         
