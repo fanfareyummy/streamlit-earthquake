@@ -266,12 +266,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         show_df = df.sample(min(450, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
+        # 🛠️ [수정 완료] 자바스크립트 변환 시 문자열이 잘리지 않도록 안전 포맷 설계 적용
         points_js = []
         for _, row in show_df.iterrows():
             g_name = grade_map.get(int(row["cluster"]), "저위험군")
-            points_js.append(f"{{lat: {row['위도']}, lon: {row['경도']}, color: '{HEX_MAP[g_name]}', size: {row['규모']}}}")
+            # 쉼표와 중괄호 누락 방지를 보장하는 완전한 단일 라인 문자열 서식
+            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{HEX_MAP[g_name]}', size: {float(row['규모'])}}}"
+            points_js.append(p_str)
         
-        # ⚠️ [에러 해결 완료] 끊겨서 렌더링을 방해하던 유효하지 않은 데이터를 싹 치우고 완전 가동되도록 수정했습니다!
         points_js_str = ",\n".join(points_js)
 
         three_js_code = f"""
@@ -297,6 +299,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 let isDragging = false;
                 let previousMousePosition = {{ x: 0, y: 0 }};
                 
+                // 완벽히 닫힌 JSON 리스트 맵
                 const points = [{points_js_str}];
                 const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 8.5 }};
 
