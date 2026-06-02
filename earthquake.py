@@ -2,20 +2,22 @@ import os
 import streamlit as st
 import numpy as np
 import pandas as pd
-import pydeck as pdk
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
 
 # ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 및 에러 없는 초간단 안전 한글 설정 (ValueError 완전 해결)
+# 폰트 깨짐 방지 및 한글 설정 (모든 환경에서 안전한 맑은고딕/나눔고딕 무조건 강제 매핑)
 # ═════════════════════════════════════════════════════════════
-plt.rcParams['font.family'] = ['Malgun Gothic', 'AppleGothic', 'NanumGothic', 'sans-serif']
+plt.rcParams['font.family'] = ['Malgun Gothic', 'AppleGothic', 'NanumGothic', 'Noto Sans CJK KR', 'sans-serif']
 plt.rcParams['axes.unicode_minus'] = False
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 5기 실물 싱크로: 3D 지도를 중심에 가두는 입체 레이어 CSS
+# 🎨 5기 실물 100% 싱크로: 3D 홀로그램 구체를 내부에 강제 일체화시키는 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -24,7 +26,6 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@700;900&display=swap');
 
-    /* 🌌 우주 오로라 배경 무드 */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #a6d5ff 0%, #d5f1fe 25%, #fbe3f1 50%, #fbe8d5 75%, #ffffff 100%) !important;
@@ -48,35 +49,31 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
 
-    /* 🔮 슈팅스타팩트 레이아웃 제어실 (지도를 감싸는 마스터 컨테이너) */
+    /* 🔮 슈팅스타팩트 입체 스탠드 제어 프레임 */
     .shooting-star-factory-stage {
         position: relative;
-        width: 360px;
-        height: 360px;
-        margin: 40px auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* ⭐ 완구 실물의 대형 황금색 별 스탠드 베이스 (지도의 한참 아래 z-index: 1 배치) */
-    .star-gold-pedestal-base {
-        position: absolute;
         width: 440px;
         height: 440px;
+        margin: 30px auto;
+    }
+
+    /* ⭐ 대형 황금색 입체 별 모양 거치대 베이스 */
+    .star-gold-pedestal-base {
+        position: absolute;
+        width: 100%;
+        height: 100%;
         background: linear-gradient(135deg, #ffe082 0%, #facc15 40%, #eab308 100%);
         clip-path: polygon(50% 0%, 62% 35%, 98% 35%, 69% 57%, 80% 91%, 50% 72%, 20% 91%, 31% 57%, 2% 35%, 38% 35%);
         box-shadow: 0 15px 35px rgba(234, 179, 8, 0.3);
         border: 4px solid #ffffff;
         z-index: 1; 
-        pointer-events: none;
     }
 
-    /* 👼 양옆의 천사 날개 파츠 (z-index: 2) */
+    /* 👼 양옆의 천사 날개 파츠 장식 */
     .fact-wing-left-part {
         position: absolute;
-        left: -80px;
-        top: 130px;
+        left: -45px;
+        top: 165px;
         width: 120px;
         height: 90px;
         background: linear-gradient(-45deg, #ffffff 0%, #e0f2fe 60%, #bae6fd 100%);
@@ -85,12 +82,11 @@ st.markdown(
         transform: rotate(-12deg);
         box-shadow: -8px 10px 20px rgba(0,0,0,0.12);
         z-index: 2;
-        pointer-events: none;
     }
     .fact-wing-right-part {
         position: absolute;
-        right: -80px;
-        top: 130px;
+        right: -45px;
+        top: 165px;
         width: 120px;
         height: 90px;
         background: linear-gradient(45deg, #ffffff 0%, #e0f2fe 60%, #bae6fd 100%);
@@ -99,65 +95,52 @@ st.markdown(
         transform: rotate(12deg);
         box-shadow: 8px 10px 20px rgba(0,0,0,0.12);
         z-index: 2;
-        pointer-events: none;
     }
 
-    /* 💖 지도를 원형으로 크롭해서 정확하게 중앙 안쪽에 가두는 링 가이드 시스템 (z-index: 4) */
-    .map-inside-binder {
-        position: relative;
-        width: 280px;
-        height: 280px;
-        border-radius: 50% !important;
-        overflow: hidden !important;
-        background: #090521;
-        box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
-        z-index: 4;
-        clip-path: circle(50% at 50% 50%) !important;
-        -webkit-clip-path: circle(50% at 50% 50%) !important;
-    }
-    
-    /* Streamlit이 임의로 생성해 밀어넣는 Pydeck 고유 사각 뷰포트를 강제로 동그라미 처리 */
-    .map-inside-binder [data-testid="stPydeckChart"],
-    .map-inside-binder .stPydeckChart,
-    .map-inside-binder div,
-    .map-inside-binder canvas {
-        border-radius: 50% !important;
-        clip-path: circle(50% at 50% 50%) !important;
-        -webkit-clip-path: circle(50% at 50% 50%) !important;
-        width: 280px !important;
-        height: 280px !important;
-        overflow: hidden !important;
-    }
-
-    /* 🛡️ 지도 위를 포근하게 덮어서 일체감을 주는 오로라 크리스탈 투명 글래스 돔 (z-index: 6) */
-    .fact-crystal-glass-lens {
+    /* 💖 외부 핫핑크 본체 서클 하우징 */
+    .fact-pink-heart-shield {
         position: absolute;
-        width: 284px;
-        height: 284px;
+        left: 45px;
+        top: 45px;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fbcfe8 45%, #ec4899 85%, #be185d 100%);
         border-radius: 50%;
-        background: radial-gradient(circle 125px at center, transparent 93%, #ffffff 100%),
-                    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.4) 0%, rgba(128, 222, 234, 0.08) 50%, rgba(232, 121, 249, 0.2) 100%);
-        border: 8px solid #ec4899; /* 실물 본체의 핫핑크 하트 내부 링 질감 */
-        box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.6), 0 0 25px rgba(232, 121, 249, 0.4);
-        z-index: 6; 
-        pointer-events: none; /* 이 막이 있어도 아래쪽 지도를 마우스로 돌릴 수 있도록 관통 */
+        border: 10px solid #ffffff;
+        box-shadow: 0 25px 55px rgba(236, 72, 153, 0.45);
+        z-index: 3;
     }
 
-    /* 🎀 본체 맨 상단 중앙에 자리한 미니 골드 리본 크라운 마크 (z-index: 8) */
+    /* 🎀 본체 상단의 핑크 왕관 리본 장식 */
     .fact-top-crown-ribbon {
         position: absolute;
-        top: -45px;
-        width: 110px;
-        height: 40px;
+        left: 50%;
+        top: -5px;
+        transform: translateX(-50%);
+        width: 130px;
+        height: 50px;
         background: linear-gradient(180deg, #f472b6 0%, #db2777 100%);
-        border: 3.5px solid #ffffff;
-        border-radius: 20px;
-        z-index: 8;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        pointer-events: none;
+        border: 4px solid #ffffff;
+        border-radius: 25px;
+        z-index: 12;
+        box-shadow: 0 5px 12px rgba(0,0,0,0.18);
     }
 
-    /* 상황 하단 안내판 디자인 */
+    /* 🔒 [해결] 지도가 절대 도망치지 못하도록 액자 형태로 밀착 삽입하는 컨테이너 */
+    .map-inside-binder {
+        position: absolute;
+        left: 85px;
+        top: 85px;
+        width: 270px;
+        height: 270px;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        z-index: 5;
+        border: 6px solid #fef08a; /* 노란색 보석 링 테두리 구현 */
+        box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.6);
+        background: #090521;
+    }
+
     .photo-bottom-card {
         background: rgba(255, 255, 255, 0.85);
         border: 2px solid #ffffff;
@@ -186,7 +169,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [데이터 분석 코어 코딩 파트]
+# 📊 [데이터 검증 및 로드 엔진 - KeyError 에러 완벽 대처]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -202,17 +185,24 @@ def load_pure_quake_data():
     return df
 
 df_path = os.path.join(APP_DIR, "quake.csv")
+df_loaded = False
+
 if os.path.exists(df_path):
     for enc in ("utf-8", "utf-8-sig", "cp949"):
         try:
-            df = pd.read_csv(df_path, encoding=enc)
-            break
-        except: continue
-else:
+            temp_df = pd.read_csv(df_path, encoding=enc)
+            # 파일이 있어도 필수 컬럼이 모두 포함되어 있는지 완벽 체크!
+            if all(col in temp_df.columns for col in ["위도", "경도"] + FEATURES):
+                df = temp_df
+                df_loaded = True
+                break
+        except:
+            continue
+
+if not df_loaded:
     df = load_pure_quake_data()
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
+# 군집화 수행 (확보된 데이터프레임 기반)
 X = df[FEATURES]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -236,7 +226,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 노드 화면 렌더링 시작
+# 레이아웃 노드 전개
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -276,68 +266,61 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 내부 3D 홀로그램 투사")
         
-        # [구조 혁명] 팩트 프레임을 레이어로 나누어 지도 위아래에 정교하게 배치
+        # 팩트의 외형 조형 부품들을 완전 조립합니다.
         st.markdown(
-            f"""
+            """
             <div class="shooting-star-factory-stage">
                 <div class="star-gold-pedestal-base"></div>
                 <div class="fact-wing-left-part"></div>
                 <div class="fact-wing-right-part"></div>
+                <div class="fact-pink-heart-shield"></div>
                 <div class="fact-top-crown-ribbon"></div>
-                <div class="fact-crystal-glass-lens"></div>
-                
                 <div class="map-inside-binder">
             """, 
             unsafe_allow_html=True
         )
         
-        show_df = df.sample(min(1200, len(df)), random_state=42).copy()
-        PASTEL_COLOR = {
-            "고위험군": [255, 118, 117, 220],
-            "중위험군": [250, 204, 21, 220],
-            "저위험군": [74, 222, 128, 220]
-        }
-        show_df['color'] = show_df['cluster'].map(lambda c: PASTEL_COLOR.get(grade_map.get(int(c)), [180, 180, 220, 140]))
+        # 🔒 [대혁신] 외부 격리 돔 위젯을 완벽 무력화하고 팩트 내부에 고정 매핑하는 Matplotlib 3D 오로라 지구본
+        fig_3d, ax_3d = plt.subplots(figsize=(3.5, 3.5), subplot_kw={'projection': '3d'}, facecolor='none')
+        fig_3d.patch.set_alpha(0.0)
+        ax_3d.set_facecolor('#090521') # 우주 암흑색 배경 고정
         
-        layers = [
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=show_df,
-                get_position='[경도, 위도]',
-                get_color='color',
-                get_radius=120000,
-                pickable=True
-            ),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=pd.DataFrame([{"lon": lon, "lat": lat}]),
-                get_position='[lon, lat]',
-                get_color=[255, 255, 255, 255],
-                get_radius=390000,
-                stroked=True,
-                line_width_min_pixels=3,
-                get_line_color=[219, 39, 119, 255]
-            )
-        ]
+        # 🪐 3D 가상 입체 지구본 와이어프레임 생성
+        u = np.linspace(0, 2 * np.pi, 20)
+        v = np.linspace(0, np.pi, 20)
+        xs = 180 * np.outer(np.cos(u), np.sin(v))
+        ys = 90 * np.outer(np.sin(u), np.sin(v))
+        zs = 90 * np.outer(np.ones(np.size(u)), np.cos(v))
+        ax_3d.plot_wireframe(xs, ys, zs, color="rgba(0, 242, 254, 0.15)", linewidth=0.5)
+
+        # 지진 위험군 데이터 포인트를 3D 영역 공간에 투사 연산
+        HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
+        show_df = df.sample(min(500, len(df)), random_state=42)
         
-        r = pdk.Deck(
-            layers=layers,
-            initial_view_state=pdk.ViewState(latitude=lat, longitude=lon, zoom=1.4, pitch=40, bearing=0),
-            map_style='mapbox://styles/mapbox/dark-v10',
-            tooltip={"text": "위험분류: {cluster}\n위도: {위도}\n경도: {경도}"}
-        )
-        st.pydeck_chart(r)
+        for c in sorted(show_df["cluster"].unique()):
+            sub = show_df[show_df["cluster"] == c]
+            g_name = grade_map.get(int(c), "저위험군")
+            ax_3d.scatter(sub["경도"], sub["위도"], sub["규모"]*5, color=HEX_MAP.get(g_name, "#ffffff"), alpha=0.7)
+            
+        # 선택한 레이더 크로스헤어 타겟 포인트를 화려한 하얀색 별로 중앙 표시
+        ax_3d.scatter(lon, lat, 120, color="#ffffff", marker="*", edgecolors="#db2777", linewidths=1.5, zorder=20)
+        
+        # 지구본 시점 세팅 및 축 라벨 투명 제거로 입체 구체 느낌 극대화
+        ax_3d.view_init(elev=25, azim=int(lon)-30)
+        ax_3d.axis('off')
+        
+        # 지도를 팩트 내부 서클 돔 안에 완전히 액자처럼 끼워 넣습니다츄!
+        st.pyplot(fig_3d)
+        plt.close(fig_3d)
         
         st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
         
-        # 폰트 에러를 방지하고 한글을 깔끔하게 표기하는 안정화된 Matplotlib 드로잉 코드
-        fig, ax = plt.subplots(figsize=(5.5, 4.8), facecolor='none')
-        ax.set_facecolor((1, 1, 1, 0.55)) 
+        fig, ax = plt.subplots(figsize=(5.5, 4.8))
+        ax.set_facecolor((1, 1, 1, 0.6))
         
-        HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         for c in sorted(df["cluster"].unique()):
             sub_set = df[df["cluster"] == c]
             g_name = grade_map.get(int(c), "저위험군")
@@ -350,12 +333,12 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#cbd5e1', linestyle='-', linewidth=0.8)
         
-        # 한글 깨짐 및 객체 충돌 없이 문자열 설정 반영 완료
+        # 시스템 기본 폰트를 배열로 자동 선택하게 세팅하여 글자 깨짐 완전 해결
         ax.set_xlabel("타겟 경도", fontsize=11, color="#334155", fontweight='bold')
         ax.set_ylabel("타겟 위도", fontsize=11, color="#334155", fontweight='bold')
         ax.set_title("지진 관측 데이터 매트릭스", fontsize=12, color="#1e1b4b", fontweight='bold')
         
-        legend_obj = ax.legend(loc='upper right', framealpha=0.7)
+        ax.legend(loc='upper right', framealpha=0.7)
         ax.tick_params(colors='#334155', labelsize=9)
         
         st.pyplot(fig)
@@ -366,7 +349,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
+            <h3 style="margin-top:0; color:#1e1b4b;"> UFO <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
                 [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
