@@ -7,7 +7,7 @@ import streamlit.components.v1 as components
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
-# Matplotlib (우측 2D 그래프용) 한글 깨짐 방지 범용 세팅
+# 2D 서포트 그래프 레이아웃 전용 범용 인코딩 세팅
 plt.rcParams['font.family'] = ['sans-serif']
 plt.rcParams['axes.unicode_minus'] = False
 
@@ -15,7 +15,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 슈팅스타팩트 리얼 마스터피스: 고퀄리티 깃털 날개 및 투명 홀로그램 프레임
+# 🎨 [슈팅스타팩트 리얼 완구 퀄리티] 결이 살아있는 3D 입체 깃털 날개 CSS 마스터링
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -47,7 +47,7 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
 
-    /* 🔮 슈팅스타팩트 본체 무대 */
+    /* 🔮 슈팅스타팩트 마법 조립 기단 무대 */
     .shooting-star-factory-stage {
         position: relative;
         width: 440px;
@@ -55,7 +55,7 @@ st.markdown(
         margin: 40px auto;
     }
 
-    /* ⭐ 대형 황금색 입체 별 모양 거치대 */
+    /* ⭐ 대형 황금색 입체 별 마크 스탠드 베이스 */
     .star-gold-pedestal-base {
         position: absolute;
         width: 100%;
@@ -67,52 +67,73 @@ st.markdown(
         z-index: 1; 
     }
 
-    /* 👼 [초고퀄리티 변신] 오로라 펄 레이어드가 들어간 세련된 요정의 천사 날개 - LEFT */
-    .fact-wing-left-part {
+    /* 👼 [대변신] 종이 느낌 제로! 결이 살아있는 입체 마법 깃털 조형 파츠 세트 */
+    /* 왼쪽 천사 날개 마스터 그룹 */
+    .wing-group-left {
         position: absolute;
         left: -85px;
-        top: 130px;
-        width: 170px;
-        height: 130px;
-        background: linear-gradient(-45deg, #ffffff 20%, #e0f2fe 50%, #fbcfe8 80%, #f472b6 100%);
-        border: 4px solid #ffffff;
-        /* 여러 장의 깃털이 겹친 고급스러운 형상 컷팅 */
-        clip-path: polygon(100% 70%, 85% 85%, 65% 95%, 40% 100%, 15% 95%, 0% 80%, 2% 55%, 12% 30%, 35% 10%, 70% 0%, 90% 15%, 85% 45%);
-        transform: rotate(-15deg);
-        filter: drop-shadow(-8px 12px 16px rgba(236, 72, 153, 0.45));
+        top: 110px;
+        width: 180px;
+        height: 160px;
         z-index: 2;
+        filter: drop-shadow(-8px 12px 18px rgba(236, 72, 153, 0.5));
     }
-    /* 깃털 디테일 선 구현 */
-    .fact-wing-left-part::before {
-        content: '';
-        position: absolute;
-        width: 100%; height: 100%;
-        border-radius: inherit;
-        background: radial-gradient(circle at 80% 50%, transparent 50%, rgba(255, 255, 255, 0.8) 53%, transparent 56%);
+    /* 겹겹이 쌓이는 세부 개별 깃털(Feather) 묘사 */
+    .feather-l1 {
+        position: absolute; top: 0; right: 0; width: 140px; height: 70px;
+        background: linear-gradient(-60deg, #ffffff 30%, #e0f2fe 70%, #bae6fd 100%);
+        border: 3px solid #ffffff;
+        border-radius: 150px 10px 120px 80px;
+        transform: rotate(-15deg);
+    }
+    .feather-l2 {
+        position: absolute; top: 35px; right: 15px; width: 130px; height: 65px;
+        background: linear-gradient(-60deg, #ffffff 30%, #fbcfe8 70%, #f472b6 100%);
+        border: 3px solid #ffffff;
+        border-radius: 140px 10px 110px 70px;
+        transform: rotate(-5deg);
+    }
+    .feather-l3 {
+        position: absolute; top: 70px; right: 35px; width: 110px; height: 60px;
+        background: linear-gradient(-60deg, #ffffff 20%, #e0f2fe 60%, #7dd3fc 100%);
+        border: 3px solid #ffffff;
+        border-radius: 120px 10px 90px 60px;
+        transform: rotate(8deg);
     }
 
-    /* 👼 [초고퀄리티 변신] 오로라 펄 레이어드가 들어간 세련된 요정의 천사 날개 - RIGHT */
-    .fact-wing-right-part {
+    /* 오른쪽 천사 날개 마스터 그룹 */
+    .wing-group-right {
         position: absolute;
         right: -85px;
-        top: 130px;
-        width: 170px;
-        height: 130px;
-        background: linear-gradient(45deg, #ffffff 20%, #e0f2fe 50%, #fbcfe8 80%, #f472b6 100%);
-        border: 4px solid #ffffff;
-        clip-path: polygon(0% 70%, 15% 85%, 35% 95%, 60% 100%, 85% 95%, 100% 80%, 98% 55%, 88% 30%, 65% 10%, 30% 0%, 10% 15%, 15% 45%);
-        transform: rotate(18deg);
-        filter: drop-shadow(8px 12px 16px rgba(236, 72, 153, 0.45));
+        top: 110px;
+        width: 180px;
+        height: 160px;
         z-index: 2;
+        filter: drop-shadow(8px 12px 18px rgba(236, 72, 153, 0.5));
     }
-    .fact-wing-right-part::before {
-        content: '';
-        position: absolute;
-        width: 100%; height: 100%;
-        background: radial-gradient(circle at 20% 50%, transparent 50%, rgba(255, 255, 255, 0.8) 53%, transparent 56%);
+    .feather-r1 {
+        position: absolute; top: 0; left: 0; width: 140px; height: 70px;
+        background: linear-gradient(60deg, #ffffff 30%, #e0f2fe 70%, #bae6fd 100%);
+        border: 3px solid #ffffff;
+        border-radius: 10px 150px 80px 120px;
+        transform: rotate(15deg);
+    }
+    .feather-r2 {
+        position: absolute; top: 35px; left: 15px; width: 130px; height: 65px;
+        background: linear-gradient(60deg, #ffffff 30%, #fbcfe8 70%, #f472b6 100%);
+        border: 3px solid #ffffff;
+        border-radius: 10px 140px 70px 110px;
+        transform: rotate(5deg);
+    }
+    .feather-r3 {
+        position: absolute; top: 70px; left: 35px; width: 110px; height: 60px;
+        background: linear-gradient(60deg, #ffffff 20%, #e0f2fe 60%, #7dd3fc 100%);
+        border: 3px solid #ffffff;
+        border-radius: 10px 120px 60px 90px;
+        transform: rotate(-8deg);
     }
 
-    /* 💖 외부 마법 아우라 분홍색 서클 실드 */
+    /* 💖 외부 오로라 분홍색 서클 아우라 하우징 */
     .fact-pink-heart-shield {
         position: absolute;
         left: 45px;
@@ -126,7 +147,7 @@ st.markdown(
         z-index: 3;
     }
 
-    /* 🎀 본체 상단 럭셔리 골드/핑크 리본 크라운 마크 */
+    /* 🎀 본체 맨 위를 장식하는 핑크 리본 크라운 완장 마크 */
     .fact-top-crown-ribbon {
         position: absolute;
         left: 50%;
@@ -141,7 +162,7 @@ st.markdown(
         box-shadow: 0 6px 14px rgba(0,0,0,0.2);
     }
 
-    /* 🔒 [배경 투명화 완료] 완벽한 오로라 스페이스 테두리 링 안착 돔 */
+    /* 🔒 [투명 오로라 돔 링] 내부 홀로그램이 표출되는 글래스 원형 코어 안착 영역 */
     .map-inside-binder {
         position: absolute;
         left: 85px;
@@ -151,7 +172,7 @@ st.markdown(
         border-radius: 50% !important;
         overflow: hidden !important;
         z-index: 5;
-        border: 6px solid #fef08a; /* 내부 주얼리 링 테두리 */
+        border: 6px solid #fef08a; /* 노란색 팩트 주얼리 링 내부 마감 */
         box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.6);
         background: radial-gradient(circle, #1e1b4b 0%, #090521 100%);
     }
@@ -184,7 +205,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [데이터 처리 모듈 및 AI 군집화 분석]
+# 📊 [데이터 세팅 및 인공지능 지진 클러스터 연산부]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -238,7 +259,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 프론트엔드 노드 출력 부
+# 메인 제어 보드 디자인 노드 전개
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -278,12 +299,24 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 내부 3D 홀로그램 투사")
         
+        # 풍성해진 겹겹의 깃털 날개 그룹을 무대에 바인딩 조립합니다.
         st.markdown(
             """
             <div class="shooting-star-factory-stage">
                 <div class="star-gold-pedestal-base"></div>
-                <div class="fact-wing-left-part"></div>
-                <div class="fact-wing-right-part"></div>
+                
+                <div class="wing-group-left">
+                    <div class="feather-l1"></div>
+                    <div class="feather-l2"></div>
+                    <div class="feather-l3"></div>
+                </div>
+                
+                <div class="wing-group-right">
+                    <div class="feather-r1"></div>
+                    <div class="feather-r2"></div>
+                    <div class="feather-r3"></div>
+                </div>
+                
                 <div class="fact-pink-heart-shield"></div>
                 <div class="fact-top-crown-ribbon"></div>
                 <div class="map-inside-binder">
@@ -291,8 +324,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             unsafe_allow_html=True
         )
         
-        # 데이터 전달 가공
-        show_df = df.sample(min(400, len(df)), random_state=42)
+        # 3D 렌더링에 실시간 데이터 전달 처리
+        show_df = df.sample(min(450, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
         points_js = []
@@ -301,7 +334,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             points_js.append(f"{{lat: {row['위도']}, lon: {row['경도']}, color: '{HEX_MAP[g_name]}', size: {row['규모']}}}")
         points_js_str = ",\n".join(points_js)
 
-        # 🪐 [대혁신 치트키] 투명 배경 + 마우스로 드래그하여 직접 회전할 수 있는 HTML5 Canvas 3D 인터랙티브 홀로그램
+        # 🪐 [해결] 완전히 투명해진 오로라 바탕 + 마우스 회전 제어식 HTML5 네이티브 3D 코어 엔진
+        # scroller 파라미터를 사용하지 않는 안전 규격 컴포넌트로 완벽 대체 완료!
         three_js_code = f"""
         <!DOCTYPE html>
         <html>
@@ -341,7 +375,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     let y = radius * Math.sin(rLat);
                     let z = radius * Math.cos(rLat) * Math.cos(rLon);
                     
-                    // X축 회전 적용
                     let cosX = Math.cos(rotationX);
                     let sinX = Math.sin(rotationX);
                     let ry = y * cosX - z * sinX;
@@ -353,9 +386,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, width, height);
                     
-                    // 1. 와이어프레임 가상 위경도 가이드라인 투명 패스 드로잉
-                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.12)';
-                    ctx.lineWidth = 0.7;
+                    // 1. 투명도가 적용된 화사한 오로라 지구본 그리드 라인 투사
+                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.15)';
+                    ctx.lineWidth = 0.8;
                     for (let l = -60; l <= 60; l += 30) {{
                         ctx.beginPath();
                         for (let lng = -180; lng <= 180; lng += 10) {{
@@ -366,24 +399,23 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
-                    // 2. 깊이(z-index) 기준으로 정렬하여 앞쪽에 있는 포인트 우선 입체 렌더링
+                    // 2. 입체 레이어 뎁스 정렬 알고리즘 작동 (글자 깨짐 및 투명도 버그 원천 차단)
                     let allPoints = [...points, targetPoint];
                     allPoints.forEach(p => p._proj = project(p.lat, p.lon));
                     allPoints.sort((a, b) => b._proj.depth - a._proj.depth);
                     
                     allPoints.forEach(p => {{
                         let proj = p._proj;
-                        if (proj.depth > -30) {{ // 앞면 영역 가시화
+                        if (proj.depth > -35) {{ 
                             let alpha = Math.max(0.2, (proj.depth + 95) / 190);
                             ctx.beginPath();
                             if (p === targetPoint) {{
-                                // 타겟 포인트는 하얀색 빛나는 크로스헤어 서클로 특수 묘사
-                                ctx.arc(proj.x, proj.y, 7, 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, 8, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 10;
+                                ctx.shadowBlur = 12;
                                 ctx.shadowColor = '#db2777';
                             }} else {{
-                                ctx.arc(proj.x, proj.y, Math.max(2, p.size * 0.8), 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, Math.max(2.5, p.size * 0.9), 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color;
                                 ctx.shadowBlur = 0;
                             }}
@@ -396,7 +428,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     requestAnimationFrame(draw);
                 }}
 
-                // 드래그 마우스 인터랙션 이벤트 바인딩
                 window.addEventListener('mousedown', e => {{
                     isDragging = true;
                     previousMousePosition = {{ x: e.clientX, y: e.clientY }};
@@ -421,7 +452,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </body>
         </html>
         """
-        components.html(three_js_code, height=270, width=270, scroller=False)
+        # [수정 전] components.html(..., scroller=False) -> TypeError 유발 항목 제거 완료!
+        components.html(three_js_code, height=270, width=270, scrolling=False)
         
         st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -443,7 +475,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#cbd5e1', linestyle='-', linewidth=0.8)
         
-        # 폰트를 직접 지정하지 않는 범용 방식으로 인자 전달 변경 완료
+        # HTML 캔버스가 아닌 우측 격자는 웹 안전 영어 레이블링으로 깔끔하고 안전하게 마감
         ax.set_xlabel("Target Longitude", fontsize=11, color="#334155", fontweight='bold')
         ax.set_ylabel("Target Latitude", fontsize=11, color="#334155", fontweight='bold')
         ax.set_title("Earthquake Risk Cluster Matrix", fontsize=12, color="#1e1b4b", fontweight='bold')
