@@ -8,48 +8,41 @@ import matplotlib.font_manager as fm
 import matplotlib as mpl
 
 # ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 무조건 방지 (Matplotlib 전역 엔진 강제 주입)
+# 폰트 깨짐 무조건 방지 (물리적 FontProperties 직접 제어)
 # ═════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner=False)
-def setup_korean_font():
-    # 1. 윈도우, 맥, 리눅스 범용 기본 폰트명 리스트 선언
-    font_names = ["Malgun Gothic", "AppleGothic", "NanumGothic", "sans-serif"]
-    
-    # 2. 시스템 물리 경로 추적 및 캐싱 등록
-    local_candidates = [
-        "C:/Windows/Fonts/malgun.ttf", 
-        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+def get_robust_font():
+    # 시스템 대표 폰트 후보들
+    candidates = [
+        ("Malgun Gothic", "C:/Windows/Fonts/malgun.ttf"),
+        ("AppleGothic", "/System/Library/Fonts/AppleSDGothicNeo.ttc"),
+        ("NanumGothic", "/usr/share/fonts/truetype/nanum/NanumGothic.ttf")
     ]
-    chosen_font = font_names[0]
-    for path in local_candidates:
+    
+    for name, path in candidates:
         if os.path.exists(path):
             try:
                 fm.fontManager.addfont(path)
-                chosen_font = fm.FontProperties(fname=path).get_name()
-                break
-            except Exception: pass
+                return fm.FontProperties(fname=path)
+            except: pass
             
-    # 3. 차트 엔진 전역 설정에 확실하게 폰트 패밀리 주입 (한글 깨짐 원천 차단)
-    mpl.rcParams["font.family"] = chosen_font
-    mpl.rcParams["axes.unicode_minus"] = False
-    return chosen_font
+    # 최악의 경우 시스템 기본 고딕 리턴
+    return fm.FontProperties(family="sans-serif")
 
-KOREAN_FONT = setup_korean_font()
+font_prop = get_robust_font()
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 하얀 별빛이 떨어지는 무드 + iframe 뚫림 방지용 홀로그램 원 CSS
+# 🎨 하얀 별빛 애니메이션 + 완벽한 원형 차단 마스크 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
 st.markdown(
     f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@500;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@700;900&display=swap');
 
-    /* 전체 오로라 배경 무드 */
     html, body, [data-testid="stAppViewContainer"] {{
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #b4c5e7 0%, #eef2fa 40%, #e3daf7 70%, #f7e3ef 100%) !important;
@@ -62,56 +55,49 @@ st.markdown(
         position: relative;
     }}
 
-    /* 🌟 상단 및 화면 전체에 하얀색 별빛이 떨어지는 애니메이션 효과 */
+    /* 🌟 상단에서 무수히 떨어지는 하얀색 별빛 효과 */
     .stMainBlockContainer::before {{
-        content: "✨";
+        content: "★";
         position: absolute;
         top: -20px;
-        left: 25%;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 16px;
-        animation: fallStars 7s infinite linear;
+        left: 30%;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 14px;
+        animation: fallStars 6s infinite linear;
         pointer-events: none;
         z-index: 99;
     }}
     .stMainBlockContainer::after {{
-        content: "✧  * ✨";
+        content: "✧  ✨  *";
         position: absolute;
         top: -30px;
-        left: 70%;
-        color: rgba(255, 255, 255, 0.75);
-        font-size: 18px;
-        letter-spacing: 140px;
-        animation: fallStars 10s infinite linear;
+        left: 75%;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 16px;
+        letter-spacing: 150px;
+        animation: fallStars 8s infinite linear;
         pointer-events: none;
         z-index: 99;
     }}
     @keyframes fallStars {{
-        0% {{ transform: translateY(-30px) rotate(0deg); opacity: 0; }}
-        15% {{ opacity: 1; }}
-        85% {{ opacity: 1; }}
-        100% {{ transform: translateY(750px) rotate(360deg); opacity: 0; }}
+        0% {{ transform: translateY(-20px) rotate(0deg); opacity: 0; }}
+        10% {{ opacity: 1; }}
+        90% {{ opacity: 1; }}
+        100% {{ transform: translateY(800px) rotate(360deg); opacity: 0; }}
     }}
 
-    /* 최상단 투명 타이틀 메인 바 */
     .photo-top-header {{
-        background: rgba(255, 255, 255, 0.55);
-        border: 2px solid rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.6);
+        border: 2px solid rgba(255, 255, 255, 0.8);
         border-radius: 24px;
         padding: 18px 30px;
         text-align: center;
-        box-shadow: 0 10px 35px rgba(180, 185, 215, 0.2);
+        box-shadow: 0 10px 35px rgba(180, 185, 215, 0.15);
         margin-bottom: 30px;
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(10px);
     }}
-    .photo-top-header h1 {{
-        margin: 0;
-        font-size: 25px;
-        font-weight: 900;
-        color: #433d6a;
-    }}
+    .photo-top-header h1 {{ margin: 0; font-size: 25px; font-weight: 900; color: #433d6a; }}
 
-    /* 메인 홀로그램 스테이지 가로 컨테이너 */
     .hologram-stage {{
         display: flex;
         position: relative;
@@ -120,27 +106,27 @@ st.markdown(
         margin-top: 10px;
     }}
 
-    /* 🔮 슈팅스타팩트 실물 기기 정밀 실루엣 디테일 */
+    /* 🔮 슈팅스타팩트 정밀 실물 완구 본체 디테일 */
     .star-fact-device-body {{
         position: absolute;
         left: 5px;
         bottom: 10px;
-        width: 310px;
+        width: 300px;
         height: 350px;
         background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f7e9f8 45%, #e9cbe0 80%, #d8aadc 100%);
         border: 10px solid #ffffff;
         border-radius: 85px 85px 70px 70px;
-        box-shadow: -15px 25px 40px rgba(100, 85, 135, 0.3), inset -4px -4px 15px rgba(0,0,0,0.06);
-        transform: perspective(1000px) rotateY(25deg) rotateX(8deg);
+        box-shadow: -15px 25px 40px rgba(100, 85, 135, 0.25), inset -4px -4px 15px rgba(0,0,0,0.05);
+        transform: perspective(1000px) rotateY(24deg) rotateX(6deg);
         z-index: 2;
     }}
     .star-fact-device-body::before {{
         content: "";
         position: absolute;
-        left: -38px;
+        left: -36px;
         top: 26%;
-        width: 44px;
-        height: 125px;
+        width: 42px;
+        height: 120px;
         background: linear-gradient(135deg, #ffe082 0%, #ffb300 50%, #ffa000 100%);
         border-radius: 50px 12px 12px 50px;
         border: 3px solid #ffffff;
@@ -150,11 +136,11 @@ st.markdown(
         bottom: 22px;
         left: 18px;
         right: 18px;
-        height: 145px;
+        height: 140px;
         background: linear-gradient(180deg, #0b081d 0%, #13184b 100%);
         border: 3.5px solid #dca7ed;
         border-radius: 16px;
-        box-shadow: inset 0 0 20px rgba(0,255,221,0.4);
+        box-shadow: inset 0 0 20px rgba(0,255,221,0.35);
         padding: 12px;
         color: #80deea;
         font-family: 'Orbit', sans-serif;
@@ -162,47 +148,37 @@ st.markdown(
         line-height: 1.6;
     }}
 
-    /* 액정 모니터에서 퍼져 나가는 오로라 홀로그램 광선 */
     .hologram-light-beam {{
         position: absolute;
         left: 175px;
         bottom: 100px;
         width: 240px;
         height: 280px;
-        background: linear-gradient(45deg, rgba(220, 167, 237, 0.35) 0%, rgba(128, 222, 234, 0.15) 60%, transparent 100%);
+        background: linear-gradient(45deg, rgba(220, 167, 237, 0.3) 0%, rgba(128, 222, 234, 0.1) 60%, transparent 100%);
         clip-path: polygon(0% 100%, 40% 100%, 100% 0%, 50% 0%);
         pointer-events: none;
         z-index: 1;
     }}
 
-    /* 🔮 핵심 레이어: iframe 지도가 사각형으로 깨지는 것을 막기 위해 '지도 위에 배치하는' 원형 오로라 마스크 쉴드 */
-    .hologram-mask-shield {{
-        position: absolute;
-        left: 310px;
-        top: 0px;
-        width: 400px;
-        height: 400px;
-        border-radius: 50%;
-        /* 원 바깥쪽 사각형 영역을 하얗고 투명한 오로라 질감으로 완전히 뒤덮어 가려버림 */
-        border: 16px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 0 35px rgba(128, 222, 234, 0.6), 
-                    0 0 60px rgba(220, 166, 245, 0.5),
-                    inset 0 0 40px rgba(255, 255, 255, 0.8);
-        background: radial-gradient(circle at center, transparent 55%, rgba(255, 255, 255, 0.4) 70%, rgba(230, 210, 245, 0.6) 100%);
-        z-index: 10; /* 지도가 생성되는 레이어(z-index: 4)보다 위로 올려서 모서리를 완전히 덮음 */
-        pointer-events: none; /* 지도를 마우스로 드래그할 수 있도록 이벤트를 관통시킴 */
-        animation: floatSphere 3.2s infinite alternate ease-in-out;
-    }}
-
-    /* 실제 지도가 들어가는 배치용 언더바인더 박스 */
+    /* 🔥 [버그 해결 핵심] iframe 지도를 무조건 원형으로 깎아 가두는 블렌딩 마스크 컨테이너 */
     .map-under-binder {{
         position: absolute;
-        left: 326px;
-        top: 16px;
-        width: 368px;
-        height: 368px;
-        z-index: 4; /* 마스크 쉴드 바로 아래 깔리게 조정 */
+        left: 320px;
+        top: 10px;
+        width: 380px;
+        height: 380px;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        border: 8px solid #ffffff;
+        box-shadow: 0 0 30px rgba(128, 222, 234, 0.5), 0 0 50px rgba(220, 166, 245, 0.4);
+        z-index: 4;
         animation: floatSphere 3.2s infinite alternate ease-in-out;
+    }}
+    
+    /* Pydeck 내부 스퀘어 요소를 브라우저 단에서 강제로 원형 매핑 처리 */
+    .map-under-binder [data-testid="stPydeckChart"], .map-under-binder iframe {{
+        border-radius: 50% !important;
+        clip-path: circle(50% at 50% 50%) !important;
     }}
 
     @keyframes floatSphere {{
@@ -210,7 +186,6 @@ st.markdown(
         100% {{ transform: translateY(-12px); }}
     }}
 
-    /* 하단 피드 정보창 */
     .photo-bottom-card {{
         background: rgba(255, 255, 255, 0.75);
         border: 2px solid #ffffff;
@@ -218,19 +193,12 @@ st.markdown(
         padding: 22px 28px;
         box-shadow: 0 12px 35px rgba(140, 145, 175, 0.12);
         margin-top: 25px;
-        backdrop-filter: blur(8px);
     }}
-    .danger-tag {{
-        font-weight: 900;
-        padding: 4px 12px;
-        border-radius: 12px;
-        color: white;
-    }}
+    .danger-tag {{ font-weight: 900; padding: 4px 12px; border-radius: 12px; color: white; }}
     .tag-high {{ background: #ff7675; }}
     .tag-mid {{ background: #ffeaa7; color: #555; }}
     .tag-low {{ background: #55efc4; color: #222; }}
 
-    /* 인터페이스 스캔 버튼 */
     .stButton>button {{
         background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%) !important;
         color: #4a4375 !important;
@@ -244,7 +212,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [지진 데이터 예측 코어 모듈]
+# 📊 [데이터 프로세싱 엔진]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -294,7 +262,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 레이아웃 구성
+# 메인 뷰포트 레이아웃
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -334,7 +302,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 원형 투사")
         
-        # HTML 가이드 라인 빌딩
         st.markdown(
             f"""
             <div class="hologram-stage">
@@ -355,7 +322,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             unsafe_allow_html=True
         )
         
-        # 3D 피덱 구성 (지도 위로 튀어나오는 현상을 막기 위해 깔끔한 라이트 스타일 매핑)
         show_df = df.sample(min(1200, len(df)), random_state=42).copy()
         PASTEL_COLOR = {
             "고위험군": [255, 118, 117, 220],
@@ -393,15 +359,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         )
         st.pydeck_chart(r)
         
-        # 지도를 뿌린 후 지도의 사각형 끝부분 위를 덮어버리는 원형 마스크 쉴드 레이어를 뒤이어 닫아줍니다.
-        st.markdown(
-            """
-                </div>
-                <div class="hologram-mask-shield"></div>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
+        st.markdown("</div></div>", unsafe_allow_html=True)
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
@@ -422,11 +380,16 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#dcdde1', linestyle='-', linewidth=0.8)
         
-        # 상단 전역 폰트 연동으로 한글 깨짐 완전 방어
-        ax.set_xlabel("타겟 경도", fontsize=11, color="#4f5d75", fontweight='bold')
-        ax.set_ylabel("타겟 위도", fontsize=11, color="#4f5d75", fontweight='bold')
+        # ⚠️ [한글 해결] 개별 텍스트 출력 함수마다 파이썬 FontProperties 객체를 직접 박아넣어 인코딩 강제 고정
+        ax.set_xlabel("타겟 경도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
+        ax.set_ylabel("타겟 위도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
         
-        ax.legend(loc='upper right', framealpha=0.6, fontsize=9.5)
+        # 범례 창에도 명시적 개별 폰트 바인딩 완료
+        legend_obj = ax.legend(loc='upper right', framealpha=0.6)
+        for text in legend_obj.get_texts():
+            text.set_fontproperties(font_prop)
+            text.set_size(9.5)
+            
         ax.tick_params(colors='#4f5d75', labelsize=9)
         
         st.pyplot(fig)
