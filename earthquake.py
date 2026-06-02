@@ -1,4 +1,5 @@
 import os
+import urllib.request
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -8,38 +9,44 @@ import matplotlib.font_manager as fm
 import matplotlib as mpl
 
 # ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 무조건 방지 (물리적 FontProperties 직접 제어)
+# 폰트 깨짐 및 서버 다운 원천 차단 (웹폰트 실시간 다운로드)
 # ═════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner=False)
-def get_robust_font():
-    # 시스템 대표 폰트 후보들
-    candidates = [
-        ("Malgun Gothic", "C:/Windows/Fonts/malgun.ttf"),
-        ("AppleGothic", "/System/Library/Fonts/AppleSDGothicNeo.ttc"),
-        ("NanumGothic", "/usr/share/fonts/truetype/nanum/NanumGothic.ttf")
-    ]
+def load_korean_font_secure():
+    font_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+    os.makedirs(font_dir, exist_ok=True)
+    font_path = os.path.join(font_dir, "NanumGothic.ttf")
     
-    for name, path in candidates:
-        if os.path.exists(path):
-            try:
-                fm.fontManager.addfont(path)
-                return fm.FontProperties(fname=path)
-            except: pass
+    # 서버에 폰트 파일이 없으면 안전한 오픈소스 URL에서 다운로드
+    if not os.path.exists(font_path):
+        url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
+        try:
+            urllib.request.urlretrieve(url, font_path)
+        except Exception:
+            # 다운로드 실패 시 시스템 디폴트 폰트 속성 안전하게 반환
+            return fm.FontProperties()
             
-    # 최악의 경우 시스템 기본 고딕 리턴
-    return fm.FontProperties(family="sans-serif")
+    # Matplotlib에 물리적으로 폰트 등록
+    try:
+        fm.fontManager.addfont(font_path)
+        prop = fm.FontProperties(fname=font_path)
+        mpl.rcParams["font.family"] = prop.get_name()
+        mpl.rcParams["axes.unicode_minus"] = False
+        return prop
+    except:
+        return fm.FontProperties()
 
-font_prop = get_robust_font()
+font_prop = load_korean_font_secure()
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 하얀 별빛 애니메이션 + 완벽한 원형 차단 마스크 CSS
+# 🎨 샌드박스를 우회하는 돔-마스크 기법 및 하얀 별빛 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
 st.markdown(
-    f"""
+    """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@700;900&display=swap');
 
@@ -99,37 +106,25 @@ st.markdown(
     .photo-top-header h1 {{ margin: 0; font-size: 25px; font-weight: 900; color: #433d6a; }}
 
     .hologram-stage {{
-        display: flex;
         position: relative;
         width: 100%;
-        height: 440px;
+        height: 420px;
         margin-top: 10px;
     }}
 
-    /* 🔮 슈팅스타팩트 정밀 실물 완구 본체 디테일 */
+    /* 🔮 슈팅스타팩트 본체 */
     .star-fact-device-body {{
         position: absolute;
         left: 5px;
         bottom: 10px;
-        width: 300px;
+        width: 290px;
         height: 350px;
         background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f7e9f8 45%, #e9cbe0 80%, #d8aadc 100%);
         border: 10px solid #ffffff;
         border-radius: 85px 85px 70px 70px;
         box-shadow: -15px 25px 40px rgba(100, 85, 135, 0.25), inset -4px -4px 15px rgba(0,0,0,0.05);
-        transform: perspective(1000px) rotateY(24deg) rotateX(6deg);
+        transform: perspective(1000px) rotateY(20deg) rotateX(6deg);
         z-index: 2;
-    }}
-    .star-fact-device-body::before {{
-        content: "";
-        position: absolute;
-        left: -36px;
-        top: 26%;
-        width: 42px;
-        height: 120px;
-        background: linear-gradient(135deg, #ffe082 0%, #ffb300 50%, #ffa000 100%);
-        border-radius: 50px 12px 12px 50px;
-        border: 3px solid #ffffff;
     }}
     .star-fact-inner-lcd {{
         position: absolute;
@@ -150,35 +145,42 @@ st.markdown(
 
     .hologram-light-beam {{
         position: absolute;
-        left: 175px;
+        left: 170px;
         bottom: 100px;
         width: 240px;
         height: 280px;
-        background: linear-gradient(45deg, rgba(220, 167, 237, 0.3) 0%, rgba(128, 222, 234, 0.1) 60%, transparent 100%);
+        background: linear-gradient(45deg, rgba(220, 167, 237, 0.25) 0%, rgba(128, 222, 234, 0.08) 60%, transparent 100%);
         clip-path: polygon(0% 100%, 40% 100%, 100% 0%, 50% 0%);
         pointer-events: none;
         z-index: 1;
     }}
 
-    /* 🔥 [버그 해결 핵심] iframe 지도를 무조건 원형으로 깎아 가두는 블렌딩 마스크 컨테이너 */
+    /* 📦 지도를 하단에 안전하게 배치하는 컨테이너 */
     .map-under-binder {{
         position: absolute;
-        left: 320px;
+        left: 310px;
         top: 10px;
         width: 380px;
         height: 380px;
-        border-radius: 50% !important;
-        overflow: hidden !important;
-        border: 8px solid #ffffff;
-        box-shadow: 0 0 30px rgba(128, 222, 234, 0.5), 0 0 50px rgba(220, 166, 245, 0.4);
-        z-index: 4;
+        z-index: 3;
         animation: floatSphere 3.2s infinite alternate ease-in-out;
     }}
-    
-    /* Pydeck 내부 스퀘어 요소를 브라우저 단에서 강제로 원형 매핑 처리 */
-    .map-under-binder [data-testid="stPydeckChart"], .map-under-binder iframe {{
-        border-radius: 50% !important;
-        clip-path: circle(50% at 50% 50%) !important;
+
+    /* 🛡️ [Streamlit Cloud 전용 마스크 액자] 사각형 모서리를 배경색 오로라 판으로 완전히 덮어 은폐 */
+    .hologram-top-lens-frame {{
+        position: absolute;
+        left: 310px;
+        top: 10px;
+        width: 380px;
+        height: 380px;
+        /* 중심부는 투명원, 외곽은 연보라-화이트 오로라 판으로 채워 사각형 모서리를 물리적으로 가림 */
+        background: radial-gradient(circle 178px at center, transparent 98%, #ffffff 100%),
+                    radial-gradient(circle 182px at center, transparent 100%, rgba(238, 242, 250, 0.95) 100%);
+        border-radius: 50%;
+        box-shadow: 0 0 0 8px #ffffff, 0 0 30px rgba(128, 222, 234, 0.6), 0 0 50px rgba(220, 166, 245, 0.4);
+        z-index: 5; /* 지도(z-index 3) 위에 얹혀짐 */
+        pointer-events: none; /* 지도의 마우스 조작을 관통 방해하지 않음 */
+        animation: floatSphere 3.2s infinite alternate ease-in-out;
     }}
 
     @keyframes floatSphere {{
@@ -262,7 +264,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 뷰포트 레이아웃
+# 레이아웃 구성
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -316,6 +318,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     </div>
                 </div>
                 <div class="hologram-light-beam"></div>
+                <div class="hologram-top-lens-frame"></div>
                 
                 <div class="map-under-binder">
             """, 
@@ -380,15 +383,15 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#dcdde1', linestyle='-', linewidth=0.8)
         
-        # ⚠️ [한글 해결] 개별 텍스트 출력 함수마다 파이썬 FontProperties 객체를 직접 박아넣어 인코딩 강제 고정
+        # ⚠️ 수동으로 주입된 웹폰트 적용
         ax.set_xlabel("타겟 경도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
         ax.set_ylabel("타겟 위도", fontproperties=font_prop, fontsize=11, color="#4f5d75", fontweight='bold')
         
-        # 범례 창에도 명시적 개별 폰트 바인딩 완료
         legend_obj = ax.legend(loc='upper right', framealpha=0.6)
-        for text in legend_obj.get_texts():
-            text.set_fontproperties(font_prop)
-            text.set_size(9.5)
+        if legend_obj:
+            for text in legend_obj.get_texts():
+                text.set_fontproperties(font_prop)
+                text.set_size(9.5)
             
         ax.tick_params(colors='#4f5d75', labelsize=9)
         
