@@ -8,11 +8,14 @@ import matplotlib.font_manager as fm
 import matplotlib as mpl
 
 # ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 방지 장치 (시스템 기본 고딕 폰트 강제 매핑)
+# 폰트 깨짐 철통 방어 장치 (Matplotlib 한글 무조건 매핑)
 # ═════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner=False)
 def setup_korean_font():
     mpl.rcParams["axes.unicode_minus"] = False
+    # 플랫폼별 절대 깨지지 않는 기본 한글 고딕 패밀리 명시적 선언
+    system_fonts = ["Malgun Gothic", "AppleGothic", "NanumGothic", "sans-serif"]
+    
     local_candidates = [
         "C:/Windows/Fonts/malgun.ttf", 
         "/System/Library/Fonts/AppleSDGothicNeo.ttc",
@@ -26,14 +29,17 @@ def setup_korean_font():
                 mpl.rc("font", family=name)
                 return name
             except Exception: pass
-    return "sans-serif"
+            
+    # 파일 경로 매핑 실패 시 시스템 폰트 이름으로 강제 적용
+    mpl.rc("font", family=system_fonts[0])
+    return system_fonts[0]
 
 KOREAN_FONT = setup_korean_font()
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 사진 속 홀로그램 원 + 디테일 팩트 완벽 구현 CSS (중괄호 이중 처리)
+# 🎨 3D 지도 강제 원형 가두기 + 하얀색 떨어지는 별빛 효과 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
@@ -42,19 +48,53 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@500;700;900&display=swap');
 
-    /* 전체 배경: 사진 속 은은한 오로라 배경 */
+    /* 전체 배경 및 오로라 무드 질감 */
     html, body, [data-testid="stAppViewContainer"] {{
         font-family: 'Pretendard', sans-serif !important;
         background: linear-gradient(135deg, #b4c5e7 0%, #eef2fa 40%, #e3daf7 70%, #f7e3ef 100%) !important;
         color: #333355 !important;
+        overflow-x: hidden;
     }}
     .stMainBlockContainer {{
         background: radial-gradient(circle at 15% 25%, rgba(195, 175, 255, 0.35) 0%, transparent 50%),
                     radial-gradient(circle at 85% 75%, rgba(255, 195, 220, 0.35) 0%, transparent 50%);
         padding: 20px 40px !important;
+        position: relative;
     }}
 
-    /* 최상단 투명 둥근 타이틀 바 */
+    /* 🌟 하늘에서 떨어지는 하얀색 별빛 입자 레이아웃 효과 */
+    .stMainBlockContainer::before {{
+        content: "✨";
+        position: absolute;
+        top: -20px;
+        left: 20%;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        animation: fallStars 6s infinite linear;
+        pointer-events: none;
+        z-index: 10;
+    }}
+    .stMainBlockContainer::after {{
+        content: "✧  * ✨  .  *";
+        position: absolute;
+        top: -40px;
+        left: 60%;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 20px;
+        letter-spacing: 120px;
+        animation: fallStars 9s infinite linear;
+        pointer-events: none;
+        z-index: 10;
+    }}
+
+    @keyframes fallStars {{
+        0% {{ transform: translateY(-50px) rotate(0deg); opacity: 0; }}
+        10% {{ opacity: 1; }}
+        90% {{ opacity: 1; }}
+        100% {{ transform: translateY(800px) rotate(360deg); opacity: 0; }}
+    }}
+
+    /* 최상단 투명 타이틀 바 */
     .photo-top-header {{
         background: rgba(255, 255, 255, 0.55);
         border: 2px solid rgba(255, 255, 255, 0.7);
@@ -73,7 +113,7 @@ st.markdown(
         letter-spacing: 0.5px;
     }}
 
-    /* 메인 작업 스테이지 가로 배치 컨테이너 */
+    /* 메인 홀로그램 통합 스테이지 판넬 */
     .hologram-stage {{
         display: flex;
         position: relative;
@@ -82,61 +122,61 @@ st.markdown(
         margin-top: 10px;
     }}
 
-    /* ✨ [좌측] 슈팅스타팩트 실물 완구 하드웨어 초정밀 디테일 강화 */
+    /* 🔮 슈팅스타팩트 실물 완구 하드웨어 입체 디테일 고도화 */
     .star-fact-device-body {{
         position: absolute;
-        left: 10px;
-        bottom: 10px;
-        width: 320px;
-        height: 340px;
-        background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f6e8f7 40%, #e8c7ed 80%, #d5a3dd 100%);
-        border: 12px solid #ffffff;
-        border-radius: 90px 90px 75px 75px;
-        box-shadow: -18px 22px 45px rgba(110, 90, 140, 0.35), 
-                    inset -4px -4px 12px rgba(0,0,0,0.08),
-                    0 0 25px rgba(232, 199, 237, 0.6);
-        transform: perspective(900px) rotateY(28deg) rotateX(12deg);
+        left: 5px;
+        bottom: 20px;
+        width: 310px;
+        height: 350px;
+        background: radial-gradient(circle at 35% 35%, #ffffff 0%, #f7e9f8 45%, #e9cbe0 80%, #d8aadc 100%);
+        border: 10px solid #ffffff;
+        border-radius: 85px 85px 70px 70px;
+        box-shadow: -15px 25px 40px rgba(100, 85, 135, 0.3), 
+                    inset -4px -4px 15px rgba(0,0,0,0.06),
+                    0 0 20px rgba(235, 205, 240, 0.5);
+        transform: perspective(1000px) rotateY(26deg) rotateX(10deg);
         z-index: 2;
     }}
     
-    /* 팩트 좌측 측면: 사진 속 입체적인 금빛 날개 조형 디테일 */
+    /* 완구 금빛 사이드 윙 엠블럼 */
     .star-fact-device-body::before {{
         content: "";
         position: absolute;
-        left: -42px;
-        top: 25%;
-        width: 50px;
-        height: 130px;
-        background: linear-gradient(135deg, #ffe082 0%, #ffa000 60%, #ff8f00 100%);
-        border-radius: 60px 15px 15px 60px;
+        left: -38px;
+        top: 26%;
+        width: 44px;
+        height: 125px;
+        background: linear-gradient(135deg, #ffe082 0%, #ffb300 50%, #ffa000 100%);
+        border-radius: 50px 12px 12px 50px;
         border: 3px solid #ffffff;
-        box-shadow: -6px 6px 14px rgba(90, 50, 120, 0.25);
+        box-shadow: -5px 5px 12px rgba(80, 45, 110, 0.2);
     }}
 
-    /* 팩트 우측 측면 내부 크림 옐로우 힌지 포인트 조형 고도화 */
+    /* 오른쪽 크림치즈 옐로우 마이크&힌지 접합 핀 */
     .star-fact-device-body::after {{
         content: "";
         position: absolute;
-        right: -10px;
-        top: 40%;
-        width: 16px;
-        height: 45px;
-        background: #fff9db;
-        border: 3px solid #fff;
-        border-radius: 0 10px 10px 0;
+        right: -9px;
+        top: 42%;
+        width: 14px;
+        height: 40px;
+        background: #fffbe6;
+        border: 3px solid #ffffff;
+        border-radius: 0 8px 8px 0;
     }}
 
-    /* 팩트 하단 내부: 3줄 파동 메인 계기판 LCD 스크린 */
+    /* 완구 내부 정밀 상태 계기판 LCD 스크린 */
     .star-fact-inner-lcd {{
         position: absolute;
-        bottom: 20px;
-        left: 20px;
-        right: 20px;
-        height: 150px;
-        background: linear-gradient(180deg, #0d0a21 0%, #161b54 100%);
-        border: 4px solid #d09ee3;
-        border-radius: 18px;
-        box-shadow: inset 0 0 25px rgba(0,255,221,0.45), 0 0 15px rgba(208,158,227,0.4);
+        bottom: 22px;
+        left: 18px;
+        right: 18px;
+        height: 145px;
+        background: linear-gradient(180deg, #0b081d 0%, #13184b 100%);
+        border: 3.5px solid #dca7ed;
+        border-radius: 16px;
+        box-shadow: inset 0 0 20px rgba(0,255,221,0.4), 0 0 10px rgba(220,167,237,0.3);
         padding: 12px;
         color: #80deea;
         font-family: 'Orbit', sans-serif;
@@ -144,52 +184,62 @@ st.markdown(
         line-height: 1.6;
     }}
 
-    /* ✨ [중앙] 핵심 수정: 사진처럼 팩트 LCD에서 대각선 위로 뻗어나가는 홀로그램 투사 빛줄기 */
+    /* 팩트 액정에서 대각선 공간으로 터져 나오는 광선 기둥 */
     .hologram-light-beam {{
         position: absolute;
-        left: 190px;
+        left: 180px;
         bottom: 110px;
-        width: 260px;
-        height: 280px;
-        background: linear-gradient(45deg, rgba(206, 147, 216, 0.45) 0%, rgba(128, 222, 234, 0.25) 50%, transparent 100%);
-        clip-path: polygon(0% 100%, 35% 100%, 100% 0%, 40% 0%);
+        width: 250px;
+        height: 290px;
+        background: linear-gradient(45deg, rgba(220, 167, 237, 0.4) 0%, rgba(128, 222, 234, 0.2) 60%, transparent 100%);
+        clip-path: polygon(0% 100%, 40% 100%, 100% 0%, 50% 0%);
         pointer-events: none;
-        z-index: 3;
+        z-index: 1;
     }}
 
-    /* ✨ [핵심 원 기믹] 3D 지도를 완벽하게 가두어 둥실 띄우는 빛나는 '홀로그램 원형 구체' 컨테이너 */
-    .globe-floating-sphere {{
+    /* 🔮 핵심 변경: 3D 지도를 뚫리지 않게 강제 잠금하는 홀로그램 유리 구체 프레임 구조 */
+    .globe-outer-frame {{
         position: absolute;
-        left: 350px;
+        left: 330px;
         top: 20px;
-        width: 380px;
-        height: 380px;
-        border-radius: 50% !important; /* 무조건 원형 유지 */
-        overflow: hidden !important;   /* 중요: 내부 3D 지도가 사각형으로 튀어나오는 것 차단 */
-        border: 6px solid rgba(255, 255, 255, 0.7);
-        background: radial-gradient(circle at center, transparent 30%, rgba(128, 222, 234, 0.1) 70%, rgba(206, 147, 216, 0.2) 100%);
-        box-shadow: 0 0 40px rgba(128, 222, 234, 0.5), 
-                    0 0 70px rgba(218, 166, 247, 0.4),
-                    inset 0 0 30px rgba(255, 255, 255, 0.6);
-        z-index: 4;
-        animation: floatSphere 3.5s infinite alternate ease-in-out;
-    }}
-    
-    /* 홀로그램 구체가 공중에 기분 좋게 둥실둥실 떠오르는 애니메이션 효과 */
-    @keyframes floatSphere {{
-        0% {{ transform: translateY(0px); }}
-        100% {{ transform: translateY(-12px); }}
+        width: 390px;
+        height: 390px;
+        border-radius: 50% !important;
+        border: 6px solid rgba(255, 255, 255, 0.85);
+        box-shadow: 0 0 35px rgba(128, 222, 234, 0.6), 
+                    0 0 60px rgba(220, 166, 245, 0.45),
+                    inset 0 0 40px rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.03);
+        z-index: 5; /* 지도 위에 씌워 오로라 광택 유리 가두리 효과 연출 */
+        pointer-events: none; 
+        animation: floatSphere 3.2s infinite alternate ease-in-out;
     }}
 
-    /* 내부 Pydeck 차트 프레임도 강제로 원형 박스 크기에 동기화 고정 */
-    .globe-floating-sphere .stPydeckChart {{
+    /* Pydeck 컴포넌트가 강제로 안착하는 내부 구역 바인딩 박스 */
+    .globe-inner-map-binder {{
+        position: absolute;
+        left: 336px;
+        top: 26px;
+        width: 378px;
+        height: 378px;
+        border-radius: 50% !important;
+        overflow: hidden !important; /* 내부 사각형 지도 완벽 제거 마스킹 */
+        z-index: 4;
+        animation: floatSphere 3.2s infinite alternate ease-in-out;
+    }}
+
+    /* 이중 마스킹 적용: Streamlit 내부 프레임까지 원형으로 동기화 */
+    .globe-inner-map-binder > div, .globe-inner-map-binder [data-testid="stPydeckChart"] {{
         border-radius: 50% !important;
         overflow: hidden !important;
-        width: 100% !important;
-        height: 100% !important;
     }}
 
-    /* [하단] 지진 위험군 종합 피드 정보 판넬 */
+    @keyframes floatSphere {{
+        0% {{ transform: translateY(0px); }}
+        100% {{ transform: translateY(-14px); }}
+    }}
+
+    /* 하단 상황 알림판 */
     .photo-bottom-card {{
         background: rgba(255, 255, 255, 0.75);
         border: 2px solid #ffffff;
@@ -216,7 +266,7 @@ st.markdown(
     .tag-mid {{ background: #ffeaa7; color: #555; box-shadow: 0 4px 10px rgba(255,234,167,0.3); }}
     .tag-low {{ background: #55efc4; color: #222; box-shadow: 0 4px 10px rgba(85,239,196,0.3); }}
 
-    /* 인터페이스 버튼 스타일링 */
+    /* 컨트롤 실행 스캔 버튼 */
     .stButton>button {{
         background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%) !important;
         color: #4a4375 !important;
@@ -232,7 +282,7 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [본질 집중] 지진 위험군 클러스터링 코어 데이터 엔진
+# 📊 [지진 위험군 분석] 정밀 클러스터링 알고리즘 로직
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
@@ -282,7 +332,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 레이더 가동 화면 레이아웃
+# 레이어 제어 및 타겟팅 인터페이스
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -317,13 +367,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    # [좌측 복합 홀로그램 스테이지]와 [우측 격자 2D 그래프] 분할 배치
+    # [좌측 팩트 스테이지 공간] 및 [우측 2D 분포 그래프] 수평 배치 
     col_left_stage, col_right_graph = st.columns([7, 5])
     
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 원형 투사")
         
-        # HTML 뼈대 생성 (팩트 바디 + 광선 + 원형 홀로그램 가두기 틀)
+        # HTML 가이드 조형 생성 (팩트 바디 + 홀로그램 투사 빔 배치)
         st.markdown(
             f"""
             <div class="hologram-stage">
@@ -337,15 +387,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         <span style="color:#ffa726; font-weight:700;">🔮 HOLOGRAM SYSTEM READY</span>
                     </div>
                 </div>
-                
                 <div class="hologram-light-beam"></div>
                 
-                <div class="globe-floating-sphere">
+                <div class="globe-inner-map-binder">
             """, 
             unsafe_allow_html=True
         )
         
-        # 3D 피덱 지구본 세팅
+        # Pydeck 공간 지도 가동 및 데이터 색상 할당
         show_df = df.sample(min(1200, len(df)), random_state=42).copy()
         PASTEL_COLOR = {
             "고위험군": [255, 118, 117, 220],
@@ -375,7 +424,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             )
         ]
         
-        # 둥근 구체 핏에 맞도록 피치 및 스케일 조정된 뷰 스테이트
         r = pdk.Deck(
             layers=layers,
             initial_view_state=pdk.ViewState(latitude=lat, longitude=lon, zoom=2.0, pitch=40, bearing=12),
@@ -383,12 +431,20 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             tooltip={"text": "지진분석군: {cluster}\n위도: {위도}\n경도: {경도}"}
         )
         st.pydeck_chart(r)
-        st.markdown("</div></div>", unsafe_allow_html=True) # 홀로그램 스테이지 태그 마감
+        
+        # 지도 컴포넌트 상단에 유리 원형 셸 광택 효과 레이어를 강제로 뒤덮어 입체감 고정
+        st.markdown(
+            """
+                </div>
+                <div class="globe-outer-frame"></div>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
         
-        # 2D 격자 차트 드로잉 (안정적인 투명 배경색 튜플 구조)
         fig, ax = plt.subplots(figsize=(5.5, 4.8), facecolor='none')
         ax.set_facecolor((1, 1, 1, 0.45)) 
         
@@ -399,22 +455,25 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             ax.scatter(sub_set["경도"], sub_set["위도"], s=14, alpha=0.6,
                        color=HEX_MAP.get(g_name, "#b2bec3"), label=g_name)
         
-        # 사진과 매칭되는 골드 크로스헤어 타겟 별 표식 마킹
         ax.scatter(lon, lat, c="#ffeaa7", s=320, marker="*", edgecolors="#e84393", linewidths=2.5, zorder=10)
         
         ax.set_xlim(lon-30, lon+30)
         ax.set_ylim(lat-30, lat+30)
         ax.grid(True, color='#dcdde1', linestyle='-', linewidth=0.8)
         
-        ax.set_xlabel("타겟 경도", fontfamily=KOREAN_FONT, fontsize=10, color="#4f5d75")
-        ax.set_ylabel("타겟 위도", fontfamily=KOREAN_FONT, fontsize=10, color="#4f5d75")
+        # 안전한 명시적 한글 폰트 주입 및 스타일링
+        ax.set_xlabel("타겟 경도", fontfamily=KOREAN_FONT, fontsize=11, color="#4f5d75", fontweight='bold')
+        ax.set_ylabel("타겟 위도", fontfamily=KOREAN_FONT, fontsize=11, color="#4f5d75", fontweight='bold')
+        
+        # 범례 한글 인코딩 보호
+        ax.legend(prop={'family': KOREAN_FONT, 'size': 9, 'weight': 'bold'}, loc='upper right', framealpha=0.6)
         ax.tick_params(colors='#4f5d75', labelsize=9)
         
         st.pyplot(fig)
         plt.close(fig)
 
     # ═════════════════════════════════════════════════════════════
-    # 하단 피드백 텍스트창 (사진 속 정보창 레이아웃 매칭)
+    # 하단 분석 결과 피드창
     # ═════════════════════════════════════════════════════════════
     tag_cls = "tag-high" if final_grade == "고위험군" else ("tag-mid" if final_grade == "중위험군" else "tag-low")
     
