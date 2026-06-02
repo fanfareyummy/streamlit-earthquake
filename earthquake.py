@@ -1,5 +1,4 @@
 import os
-import urllib.request
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -9,229 +8,184 @@ import matplotlib.font_manager as fm
 import matplotlib as mpl
 
 # ═════════════════════════════════════════════════════════════
-# 폰트 깨짐 및 서버 다운 원천 차단 (웹폰트 실시간 다운로드)
+# 폰트 깨짐 방지 장치 (시스템 기본 고딕 폰트 강제 매핑)
 # ═════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner=False)
-def load_korean_font_secure():
-    font_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
-    os.makedirs(font_dir, exist_ok=True)
-    font_path = os.path.join(font_dir, "NanumGothic.ttf")
-    
-    if not os.path.exists(font_path):
-        url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
-        try:
-            urllib.request.urlretrieve(url, font_path)
-        except Exception:
-            return fm.FontProperties()
-            
-    try:
-        fm.fontManager.addfont(font_path)
-        prop = fm.FontProperties(fname=font_path)
-        mpl.rcParams["font.family"] = prop.get_name()
-        mpl.rcParams["axes.unicode_minus"] = False
-        return prop
-    except:
-        return fm.FontProperties()
+def setup_korean_font():
+    mpl.rcParams["axes.unicode_minus"] = False
+    local_candidates = [
+        "C:/Windows/Fonts/malgun.ttf", 
+        "C:/Windows/Fonts/malgunbd.ttf",
+        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+        "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+    ]
+    for path in local_candidates:
+        if os.path.exists(path):
+            try:
+                fm.fontManager.addfont(path)
+                name = fm.FontProperties(fname=path).get_name()
+                mpl.rc("font", family=name)
+                return name
+            except Exception:
+                pass
+    return "sans-serif"
 
-font_prop = load_korean_font_secure()
+KOREAN_FONT = setup_korean_font()
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 슈팅스타팩트 실물 구현 및 3D 지도 완벽 봉인 CSS
+# 🌌 [캐치! 티니핑 시즌 5: 슈팅스타팩트] 오로라 스페이스 팩트 테마 (CSS)
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 위험군 시스템", page_icon="🔮", layout="wide")
 
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbit&family=Pretendard:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbit+Spaces&family=Pretendard:wght@700;900&display=swap');
 
-    /* 🌌 전체 파스텔 오로라 우주 공간 배경 */
+    /* 전체 배경: 화려한 파스텔 오로라 우주 무드 */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Pretendard', sans-serif !important;
-        background: linear-gradient(135deg, #b4c5e7 0%, #eef2fa 30%, #e3daf7 65%, #fbcfe8 100%) !important;
+        background: linear-gradient(135deg, #a6d5ff 0%, #d5f1fe 25%, #fbe3f1 50%, #fbe8d5 75%, #ffffff 100%) !important;
         color: #3b3a57 !important;
     }
-    
     .stMainBlockContainer {
-        background: radial-gradient(circle at 20% 25%, rgba(167, 139, 250, 0.45) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 75%, rgba(244, 114, 182, 0.4) 0%, transparent 50%);
-        padding: 25px 50px !important;
-        position: relative;
+        background: radial-gradient(circle at 15% 25%, rgba(138, 43, 226, 0.4) 0%, transparent 60%),
+                    radial-gradient(circle at 85% 75%, rgba(255, 105, 180, 0.4) 0%, transparent 60%);
+        padding: 30px 60px !important;
     }
 
-    /* ⭐ 위에서 떨어지는 은은한 하얀 별빛 이펙트 */
-    .stMainBlockContainer::before {
-        content: "★";
-        position: absolute;
-        top: -20px;
-        left: 15%;
-        color: rgba(255, 255, 255, 0.95);
-        font-size: 14px;
-        animation: fallStars 6s infinite linear;
-        pointer-events: none;
-        z-index: 99;
-    }
-    .stMainBlockContainer::after {
-        content: "✧  ✨  ✦  *";
-        position: absolute;
-        top: -30px;
-        left: 70%;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 16px;
-        letter-spacing: 150px;
-        animation: fallStars 8s infinite linear;
-        pointer-events: none;
-        z-index: 99;
-    }
-    @keyframes fallStars {
-        0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { transform: translateY(850px) rotate(360deg); opacity: 0; }
-    }
-
+    /* 최상단 타이틀 바 */
     .photo-top-header {
         background: rgba(255, 255, 255, 0.7);
         border: 2px solid rgba(255, 255, 255, 0.9);
         border-radius: 26px;
-        padding: 16px;
+        padding: 20px;
         text-align: center;
-        box-shadow: 0 10px 35px rgba(165, 180, 252, 0.2);
-        margin-bottom: 25px;
-        backdrop-filter: blur(10px);
-    }
-    .photo-top-header h1 { margin: 0; font-size: 25px; font-weight: 900; color: #433d6a; }
+        box-shadow: 0 12px 40px rgba(165, 180, 252, 0.25);
+        margin-bottom: 30px;
+        backdrop-filter: blur(12px);
+    }}
+    .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
 
-    /* 🔮 슈팅스타팩트 입체 레이아웃 스테이지 */
-    .hologram-absolute-universe {
+    /* 슈팅스타팩트 입체 스테이지 구역 */
+    .shooting-star-factory-stage {
         position: relative;
-        width: 440px;
-        height: 440px;
-        margin: 20px auto;
-    }
-
-    /* 🌟 완구의 상징인 하단 대형 입체 노란색 별 모양 스탠드 */
-    .star-gold-pedestal {
-        position: absolute;
         width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #ffe082 0%, #facc15 40%, #eab308 100%);
-        clip-path: polygon(50% 0%, 62% 35%, 98% 35%, 69% 57%, 80% 91%, 50% 72%, 20% 91%, 31% 57%, 2% 35%, 38% 35%);
-        box-shadow: 0 15px 35px rgba(234, 179, 8, 0.35);
-        transform: scale(1.0);
-        border: 4px solid #ffffff;
-        z-index: 1;
+        height: 600px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    /* 💖 핑크 리본과 메인 하트 링 프레임 */
-    .fact-aurora-shield-frame {
+    /* 💖 핵심: 슈팅스타팩트 실물 디테일 구현 (윙, 스타, 보석 장식) */
+    .fact-wing-star-body {
         position: absolute;
-        left: 45px;
-        top: 45px;
-        width: 350px;
-        height: 350px;
-        background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fbcfe8 45%, #ec4899 85%, #be185d 100%);
+        width: 480px;
+        height: 480px;
+        background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fce7f3 35%, #ec4899 75%, #be185d 100%);
         border-radius: 50%;
-        border: 8px solid #ffffff;
-        box-shadow: 0 20px 50px rgba(236, 72, 153, 0.4), inset -5px -5px 15px rgba(0,0,0,0.1);
-        z-index: 3;
+        border: 12px solid #ffffff;
+        box-shadow: 0 30px 70px rgba(219, 39, 119, 0.4), inset -8px -8px 25px rgba(0,0,0,0.1);
+        z-index: 10;
+        transform: scale(0.9);
     }
-
-    /* 👼 양옆으로 멋지게 날아오른 날개 파츠 디테일 */
-    .fact-wing-part-left {
+    .fact-wing-star-body::before, .fact-wing-star-body::after {
+        content: "";
         position: absolute;
-        left: -15px;
-        top: 155px;
-        width: 85px;
-        height: 75px;
-        background: linear-gradient(-45deg, #ffffff 0%, #e0f2fe 60%, #bae6fd 100%);
-        border: 3.5px solid #ffffff;
-        border-radius: 90px 10px 90px 90px;
-        transform: rotate(-10deg);
-        box-shadow: -5px 8px 15px rgba(0,0,0,0.12);
-        z-index: 2;
+        top: 25%;
+        width: 140px;
+        height: 120px;
+        background: linear-gradient(135deg, #fef08a 0%, #facc15 60%, #eab308 100%);
+        border: 5px solid #ffffff;
+        border-radius: 50px 15px 50px 50px;
+        z-index: 5;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
-    .fact-wing-part-right {
-        position: absolute;
-        right: -15px;
-        top: 155px;
-        width: 85px;
-        height: 75px;
-        background: linear-gradient(45deg, #ffffff 0%, #e0f2fe 60%, #bae6fd 100%);
-        border: 3.5px solid #ffffff;
-        border-radius: 10px 90px 90px 90px;
-        transform: rotate(10deg);
-        box-shadow: 5px 8px 15px rgba(0,0,0,0.12);
-        z-index: 2;
-    }
+    .fact-wing-star-body::before { left: -75px; transform: rotate(-15deg); }
+    .fact-wing-star-body::after { right: -75px; transform: rotate(15deg); border-radius: 15px 50px 50px 50px; }
 
-    /* 🎀 실물 상단의 핫핑크 하트 리본 마크 */
-    .fact-crown-ribbon {
+    .fact-center-jewel {
         position: absolute;
         left: 50%;
-        top: -10px;
+        top: -20px;
         transform: translateX(-50%);
-        width: 120px;
-        height: 45px;
+        width: 180px;
+        height: 70px;
         background: linear-gradient(180deg, #f472b6 0%, #db2777 100%);
-        border: 3px solid #ffffff;
-        border-radius: 20px;
-        z-index: 10;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        border: 5px solid #ffffff;
+        border-radius: 35px;
+        z-index: 12;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.15);
     }
 
-    /* 🗺️ 지도가 사각형 바깥으로 새어 나가는 것을 완전히 막아버리는 고정 구체 캡슐 */
-    .map-inside-hologram-binder {
+    /* 📦 [수정 완료] 지도를 돔 내부로 봉인하는 언더레이어 바인더 */
+    .map-inside-binder {
         position: absolute;
-        left: 85px;
-        top: 85px;
-        width: 270px;
-        height: 270px;
-        border-radius: 50% !important;
-        overflow: hidden !important;
-        mask-image: radial-gradient(circle, white 100%, transparent 100%);
-        -webkit-mask-image: radial-gradient(circle, white 100%, transparent 100%);
-        z-index: 5;
-        background: #0b0726;
-    }
-    
-    /* Pydeck 자체의 사각형 레이아웃 요소 강제 격리 */
-    .map-inside-hologram-binder > div {
-        border-radius: 50% !important;
-        overflow: hidden !important;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 380px;
+        height: 380px;
+        border-radius: 50% !important; /* 무조건 원형 유지 */
+        overflow: hidden !important; /* 중요: 내부 지도가 돔 밖으로 튀어나오는 것 차단 */
+        z-index: 8;
+        background: #090521;
     }
 
-    /* 🛡️ 지도 위에 겹쳐 팩트 유리 렌즈 느낌을 주는 오로라 스키드 필터 (드래그 관통) */
-    .fact-glass-lens-mask {
+    /* 🛡️ 지도가 샌드박스를 뚫고 사각형으로 깨지는 것을 막기 위해 유리막 쉴드 씌우기 */
+    .fact-glass-lens {
         position: absolute;
-        left: 85px;
-        top: 85px;
-        width: 270px;
-        height: 270px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 380px;
+        height: 380px;
         border-radius: 50%;
-        background: radial-gradient(circle 122px at center, transparent 96%, #ffffff 100%),
+        /* 중심부는 투명하게 비춰 지도를 보여주고, 모서리 테두리는 마스킹 */
+        background: radial-gradient(circle 178px at center, transparent 96%, #ffffff 100%),
                     radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(128, 222, 234, 0.15) 50%, rgba(192, 132, 252, 0.25) 100%);
-        border: 5px solid #fef08a; 
-        box-shadow: inset 0 0 25px rgba(0, 242, 254, 0.5), 0 0 20px rgba(232, 121, 249, 0.4);
-        z-index: 7;
-        pointer-events: none;
+        border: 8px solid #fef08a; /* 실물 기기의 금빛 내부 링 */
+        box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.6), 0 0 30px rgba(232, 121, 249, 0.5);
+        z-index: 10; /* 지도 위에 배치됨 */
+        pointer-events: none; /* 지도의 마우스 드래그 이벤트를 방해하지 않고 관통 */
     }
 
+    /* 🌌 화려한 홀로그램 에너지 구체 (지구본 수용) */
+    .holographic-universe-sphere {
+        position: absolute;
+        left: 330px;
+        top: 330px;
+        width: 440px;
+        height: 440px;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        box-shadow: 0 0 80px rgba(128, 222, 234, 0.8), 0 0 120px rgba(220, 166, 245, 0.6), inset 0 0 50px rgba(255, 255, 255, 0.8);
+        border: 10px solid #ffffff;
+        background: rgba(255, 255, 255, 0.05);
+        z-index: 20;
+    }
+
+    /* 하단 상황 알림판 */
     .photo-bottom-card {
         background: rgba(255, 255, 255, 0.8);
         border: 2px solid #ffffff;
-        border-radius: 24px;
-        padding: 24px 30px;
-        box-shadow: 0 15px 40px rgba(148, 163, 184, 0.15);
+        border-radius: 22px;
+        padding: 22px 28px;
+        color: #444;
+        box-shadow: 0 10px 30px rgba(150, 150, 180, 0.15);
         margin-top: 25px;
+        backdrop-filter: blur(8px);
     }
-    .danger-tag { font-weight: 900; padding: 5px 14px; border-radius: 12px; color: white; }
+    .photo-bottom-card h3 { margin-top: 0; color: #1e1b4b; }
+    .danger-tag { font-weight: 900; padding: 4px 12px; border-radius: 12px; color: white; }
     .tag-high { background: #ff7675; }
     .tag-mid { background: #facc15; color: #333; }
     .tag-low { background: #4ade80; color: #111; }
 
+    /* 스캔 버튼 스타일 */
     .stButton>button {
         background: linear-gradient(90deg, #fbcfe8 0%, #c7d2fe 100%) !important;
         color: #4338ca !important;
@@ -246,10 +200,10 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [데이터 프로세싱 엔진]
+# 샘플 데이터 셋 가동 체계
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
-def load_pure_quake_data():
+def load_sample_data():
     np.random.seed(42)
     num_samples = 2000
     df = pd.DataFrame({
@@ -269,8 +223,9 @@ if os.path.exists(df_path):
             break
         except: continue
 else:
-    df = load_pure_quake_data()
+    df = load_sample_data()
 
+# 지진 대피 위험군 클러스터링 산출
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 X = df[FEATURES]
@@ -280,6 +235,7 @@ model = KMeans(n_clusters=3, random_state=42, n_init=10)
 df["cluster"] = model.fit_predict(X_scaled)
 df = df.dropna(subset=["cluster", "위도", "경도"])
 
+# 위험 등급 연산 및 인덱스 매핑
 agg = df.groupby("cluster")[FEATURES].mean()
 score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규모"].min() + 1e-5) * 0.5 + 
          (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
@@ -296,7 +252,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 레이아웃 노드 배치
+# 레이아웃 배치 시작
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -310,6 +266,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# 좌표 입력 패널
 st.markdown("### 🎯 레이더 타겟 크로스헤어 좌표 설정")
 cx, cy = st.columns(2)
 with cx:
@@ -319,6 +276,7 @@ with cy:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
+# 메인 팩트 구동 스테이지 배치
 if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매핑 스캔 시작", use_container_width=True):
     dist = haversine(lat, lon, df["위도"].values, df["경도"].values)
     near_idx = np.argsort(dist)[:20]
@@ -336,18 +294,15 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 내부 3D 홀로그램 투사")
         
-        # [수정 완료] 타이핑 오타 수정을 마치고 안정적으로 프레임 빌드
+        # [수정 완료] f-string 중괄호 에러 수정을 위해 div를 감싸는 f-string에 이중 중괄호 사용
         st.markdown(
             f"""
-            <div class="hologram-absolute-universe">
-                <div class="star-gold-pedestal"></div>
-                <div class="fact-wing-part-left"></div>
-                <div class="fact-wing-part-right"></div>
-                <div class="fact-aurora-shield-frame"></div>
-                <div class="fact-crown-ribbon"></div>
-                <div class="fact-glass-lens-mask"></div>
-                
-                <div class="map-inside-hologram-binder">
+            <div class="shooting-star-factory-stage">
+                <div class="fact-wing-star-body">
+                    <div class="fact-crown-jewel"></div>
+                    <div class="fact-glass-lens"></div>
+                    
+                    <div class="map-inside-binder">
             """, 
             unsafe_allow_html=True
         )
@@ -377,10 +332,11 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 get_radius=390000,
                 stroked=True,
                 line_width_min_pixels=3,
-                get_line_color=[219, 39, 119, 255] # <-- 21db 오타 완벽 제거 및 정상 수치 반영 완료!
+                get_line_color=[21db, 39, 119, 255]
             )
         ]
         
+        # 팩트 내부 우주 질감을 살리기 위해 맵 스타일을 다크 테마로 세팅
         r = pdk.Deck(
             layers=layers,
             initial_view_state=pdk.ViewState(latitude=lat, longitude=lon, zoom=1.4, pitch=40, bearing=0),
@@ -389,11 +345,12 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         )
         st.pydeck_chart(r)
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        st.markdown("</div></div></div>", unsafe_allow_html=True)
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
         
+        # 가독성 높은 차트 드로잉 (파스텔 & 화이트 배합)
         fig, ax = plt.subplots(figsize=(5.5, 4.8), facecolor='none')
         ax.set_facecolor((1, 1, 1, 0.55)) 
         
