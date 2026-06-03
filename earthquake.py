@@ -10,7 +10,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트 오리지널 폼] 삐져나온 핑크 제거 및 돔 정중앙 매립 CSS
+# 🎨 [슈팅스타팩트 오리지널 폼] 스트림릿 기본 프레임 및 배경 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -65,84 +65,6 @@ st.markdown(
         backdrop-filter: blur(12px);
     }
     .photo-top-header h1 { margin: 0; font-size: 26px; font-weight: 900; color: #4c4475; }
-
-    /* 🔮 슈팅스타팩트 절대 좌표 통합 프레임 무대 */
-    .shooting-star-factory-stage {
-        position: relative;
-        width: 460px;
-        height: 460px;
-        margin: 20px auto;
-        overflow: visible;
-    }
-
-    /* ⭐ 대형 황금 별 스탠드 베이스 파츠 */
-    .star-gold-pedestal-base {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #ffe082 0%, #facc15 40%, #eab308 100%);
-        clip-path: polygon(50% 0%, 63% 34%, 98% 34%, 71% 56%, 82% 90%, 50% 73%, 18% 90%, 29% 56%, 2% 34%, 37% 34%);
-        box-shadow: 0 12px 30px rgba(234, 179, 8, 0.25);
-        border: 4px solid #ffffff;
-        z-index: 1; 
-    }
-
-    /* 👼 카툰 만화영화 스타일의 부드럽고 풍성한 요정의 겹날개 구현 */
-    .fairy-wing-bundle-left {
-        position: absolute; left: -85px; top: 120px; width: 200px; height: 180px; z-index: 2;
-        filter: drop-shadow(-8px 12px 18px rgba(244, 114, 182, 0.5));
-    }
-    .fairy-wing-bundle-right {
-        position: absolute; right: -85px; top: 120px; width: 200px; height: 180px; z-index: 2;
-        filter: drop-shadow(8px 12px 18px rgba(244, 114, 182, 0.5));
-    }
-    .fairy-feather { position: absolute; background: #fff; border: 2.5px solid #fff; }
-    
-    /* 곡선미를 살린 카툰풍 라운드 깃털 배치 */
-    .f-left-1 { width: 150px; height: 68px; top: 0; right: 0; background: linear-gradient(-45deg, #ffffff, #e2f5ff, #bae6fd); border-radius: 150px 30px 130px 90px; transform: rotate(-12deg); }
-    .f-left-2 { width: 135px; height: 62px; top: 42px; right: 15px; background: linear-gradient(-45deg, #ffffff, #fce7f3, #f472b6); border-radius: 130px 25px 115px 80px; transform: rotate(-2deg); z-index: 2; }
-    .f-left-3 { width: 115px; height: 55px; top: 82px; right: 35px; background: linear-gradient(-45deg, #ffffff, #e0f2fe, #7dd3fc); border-radius: 110px 20px 95px 70px; transform: rotate(8deg); }
-
-    .f-right-1 { width: 150px; height: 68px; top: 0; left: 0; background: linear-gradient(45deg, #ffffff, #e2f5ff, #bae6fd); border-radius: 30px 150px 90px 130px; transform: rotate(12deg); }
-    .f-right-2 { width: 135px; height: 62px; top: 42px; left: 15px; background: linear-gradient(45deg, #ffffff, #fce7f3, #f472b6); border-radius: 25px 130px 80px 115px; transform: rotate(2deg); z-index: 2; }
-    .f-right-3 { width: 115px; height: 55px; top: 82px; left: 35px; background: linear-gradient(45deg, #ffffff, #e0f2fe, #7dd3fc); border-radius: 20px 110px 70px 95px; transform: rotate(-8deg); }
-
-    /* 💖 외부 오로라 분홍색 콤팩트 하우징 코어 (상단에 불필요한 캡슐 요소 완전 분리 삭제) */
-    .fact-pink-heart-shield {
-        position: absolute;
-        left: 45px;
-        top: 45px;
-        width: 370px;
-        height: 370px;
-        background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fbcfe8 45%, #ec4899 85%, #be185d 100%);
-        border-radius: 50%;
-        border: 9px solid #ffffff;
-        box-shadow: 0 22px 50px rgba(236, 72, 153, 0.4);
-        z-index: 3;
-    }
-
-    /* 🔒 [철통 매립 고정] 홀로그램 지구가 팩트 스크린 정중앙 내부 서클 안에 들어가도록 유도 */
-    .map-inside-binder {
-        position: absolute;
-        left: 85px;
-        top: 85px;
-        width: 290px;
-        height: 290px;
-        border-radius: 50% !important;
-        overflow: hidden !important;
-        z-index: 5;
-        border: 5px solid #fef08a;
-        box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.75);
-        background: #06031a;
-    }
-    
-    /* 코딩 텍스트 노출 현상을 완전히 제어하기 위한 iframe 컨테이너 규격 강제 고정 */
-    .hologram-iframe-container {
-        width: 290px !important;
-        height: 290px !important;
-        border: none !important;
-        overflow: hidden !important;
-    }
 
     .photo-bottom-card {
         background: rgba(255, 255, 255, 0.85);
@@ -274,19 +196,108 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         
         points_js_str = ",\n".join(points_js)
 
-        # 🪐 HTML 컴포넌트에 스트림릿 코드가 얽혀 텍스트가 표시되던 현상을 원천 차단한 순수 내부 스크립트
-        three_js_code = f"""
+        # 🪐 [버그 원천 차단] 팩트 그래픽 케이스 디자인과 Canvas 엔진을 하나의 iframe 샌드박스로 일원화 처리!
+        compact_master_html = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <style>
-                body {{ margin: 0; overflow: hidden; background: transparent; }}
-                canvas {{ background: transparent; width: 290px; height: 290px; cursor: grab; }}
+                body {{
+                    margin: 0; padding: 0;
+                    background: transparent;
+                    display: flex; justify-content: center; align-items: center;
+                    width: 460px; height: 460px;
+                    overflow: hidden;
+                }}
+                
+                /* 🔮 슈팅스타 팩트 일체형 베이스 무대 */
+                .shooting-star-factory-stage {{
+                    position: relative;
+                    width: 460px;
+                    height: 460px;
+                }}
+
+                /* ⭐ 황금 별 스탠드 파츠 */
+                .star-gold-pedestal-base {{
+                    position: absolute;
+                    width: 100%; height: 100%;
+                    background: linear-gradient(135deg, #ffe082 0%, #facc15 40%, #eab308 100%);
+                    clip-path: polygon(50% 0%, 63% 34%, 98% 34%, 71% 56%, 82% 90%, 50% 73%, 18% 90%, 29% 56%, 2% 34%, 37% 34%);
+                    border: 4px solid #ffffff;
+                    z-index: 1; 
+                }}
+
+                /* 👼 [수정 완료] 상단 삐져나옴 버그를 완전히 차단한 카툰 요정 날개 */
+                .fairy-wing-bundle-left {{
+                    position: absolute; left: -85px; top: 130px; width: 200px; height: 180px; z-index: 2;
+                }}
+                .fairy-wing-bundle-right {{
+                    position: absolute; right: -85px; top: 130px; width: 200px; height: 180px; z-index: 2;
+                }}
+                .fairy-feather {{ position: absolute; background: #fff; border: 2px solid #fff; }}
+                
+                .f-left-1 {{ width: 150px; height: 65px; top: 0; right: 0; background: linear-gradient(-45deg, #ffffff, #e2f5ff, #bae6fd); border-radius: 150px 30px 130px 90px; transform: rotate(-10deg); }}
+                .f-left-2 {{ width: 135px; height: 60px; top: 38px; right: 15px; background: linear-gradient(-45deg, #ffffff, #fce7f3, #f472b6); border-radius: 130px 25px 115px 80px; transform: rotate(-2deg); z-index: 2; }}
+                .f-left-3 {{ width: 115px; height: 50px; top: 76px; right: 35px; background: linear-gradient(-45deg, #ffffff, #e0f2fe, #7dd3fc); border-radius: 110px 20px 95px 70px; transform: rotate(6deg); }}
+
+                .f-right-1 {{ width: 150px; height: 65px; top: 0; left: 0; background: linear-gradient(45deg, #ffffff, #e2f5ff, #bae6fd); border-radius: 30px 150px 90px 130px; transform: rotate(10deg); }}
+                .f-right-2 {{ width: 135px; height: 60px; top: 38px; left: 15px; background: linear-gradient(45deg, #ffffff, #fce7f3, #f472b6); border-radius: 25px 130px 80px 115px; transform: rotate(2deg); z-index: 2; }}
+                .f-right-3 {{ width: 115px; height: 50px; top: 76px; left: 35px; background: linear-gradient(45deg, #ffffff, #e0f2fe, #7dd3fc); border-radius: 20px 110px 70px 95px; transform: rotate(-6deg); }}
+
+                /* 💖 콤팩트 오로라 핑크 하우징 실드 */
+                .fact-pink-heart-shield {{
+                    position: absolute;
+                    left: 45px; top: 45px;
+                    width: 370px; height: 370px;
+                    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fbcfe8 45%, #ec4899 85%, #be185d 100%);
+                    border-radius: 50%;
+                    border: 9px solid #ffffff;
+                    box-shadow: 0 15px 35px rgba(236, 72, 153, 0.35);
+                    z-index: 3;
+                }}
+
+                /* 🔒 지구본 매립 전용 내부 돔 윈도우 */
+                .map-inside-binder {{
+                    position: absolute;
+                    left: 85px; top: 85px;
+                    width: 290px; height: 290px;
+                    border-radius: 50%;
+                    overflow: hidden;
+                    z-index: 5;
+                    border: 5px solid #fef08a;
+                    box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.7);
+                    background: #06031a;
+                }}
+
+                /* 🛸 지구본 캔버스 */
+                canvas {{
+                    position: absolute;
+                    top: 0; left: 0;
+                    width: 290px; height: 290px;
+                    cursor: grab;
+                }}
                 canvas:active {{ cursor: grabbing; }}
             </style>
         </head>
         <body>
-            <canvas id="globeCanvas"></canvas>
+            <div class="shooting-star-factory-stage">
+                <div class="star-gold-pedestal-base"></div>
+                <div class="fairy-wing-bundle-left">
+                    <div class="fairy-feather f-left-1"></div>
+                    <div class="fairy-feather f-left-2"></div>
+                    <div class="fairy-feather f-left-3"></div>
+                </div>
+                <div class="fairy-wing-bundle-right">
+                    <div class="fairy-feather f-right-1"></div>
+                    <div class="fairy-feather f-right-2"></div>
+                    <div class="fairy-feather f-right-3"></div>
+                </div>
+                <div class="fact-pink-heart-shield"></div>
+                <div class="map-inside-binder">
+                    <canvas id="globeCanvas" width="290" height="290"></canvas>
+                </div>
+            </div>
+
             <script>
                 const canvas = document.getElementById('globeCanvas');
                 const ctx = canvas.getContext('2d');
@@ -343,23 +354,19 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                             if (p === targetPoint) {{
                                 ctx.arc(proj.x, proj.y, 8.5, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 15;
-                                ctx.shadowColor = '#db2777';
                             }} else {{
                                 ctx.arc(proj.x, proj.y, Math.max(2.8, p.size * 1.0), 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color;
-                                ctx.shadowBlur = 0;
                             }}
                             ctx.globalAlpha = alpha;
                             ctx.fill();
                         }}
                     }});
                     ctx.globalAlpha = 1.0;
-                    ctx.shadowBlur = 0;
                     requestAnimationFrame(draw);
                 }}
 
-                window.addEventListener('mousedown', e => {{
+                canvas.addEventListener('mousedown', e => {{
                     isDragging = true;
                     previousMousePosition = {{ x: e.clientX, y: e.clientY }};
                 }});
@@ -378,28 +385,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </body>
         </html>
         """
-
-        # 외부 삐져나옴과 덩어리 오염 버그를 100% 걷어낸 완전 차폐형 팩트 쉘 프레임워크
-        html_shell = f"""
-        <div class="shooting-star-factory-stage">
-            <div class="star-gold-pedestal-base"></div>
-            <div class="fairy-wing-bundle-left">
-                <div class="fairy-feather f-left-1"></div>
-                <div class="fairy-feather f-left-2"></div>
-                <div class="fairy-feather f-left-3"></div>
-            </div>
-            <div class="fairy-wing-bundle-right">
-                <div class="fairy-feather f-right-1"></div>
-                <div class="fairy-feather f-right-2"></div>
-                <div class="fairy-feather f-right-3"></div>
-            </div>
-            <div class="fact-pink-heart-shield"></div>
-            <div class="map-inside-binder">
-                <iframe srcdoc="{three_js_code.replace('"', '&quot;')}" class="hologram-iframe-container" frameborder="0" scrolling="no"></iframe>
-            </div>
-        </div>
-        """
-        st.markdown(html_shell, unsafe_allow_html=True)
+        
+        # 스트림릿 컴포넌트로 일체화된 샌드박스를 안전 투사!
+        components.html(compact_master_html, width=460, height=460, scrolling=False)
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
@@ -476,7 +464,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
+            <h3 style="margin-top:0; color:#1e1b4b;"> UFO <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
                 [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
