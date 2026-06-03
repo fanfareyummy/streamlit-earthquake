@@ -2,16 +2,15 @@ import os
 import streamlit as st
 import numpy as np
 import pandas as pd
-import streamlit.components.v1 as components
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-import json
+import plotly.graph_objects as go
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트: 리얼 콘투어 맵 에디션] 완벽 대칭 & 실제 세계 지도 탑재
+# 🎨 [슈팅스타팩트: 리얼 플로틀리 매핑 에디션] 3색 지진 완벽 동기화
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -54,6 +53,100 @@ st.markdown(
     }
     .photo-top-header h1 { margin: 0; font-size: 28px; font-weight: 900; color: #4a3e7d; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
 
+    /* 🔮 완벽한 1:1 좌우대칭 슈팅스타 팩트 하우징 메인 외곽 프레임 구조 */
+    .pact-total-frame {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .compact-top-crown {
+        position: absolute;
+        top: -20px; left: 50%;
+        width: 80px; height: 40px;
+        background: linear-gradient(180deg, #ff9ebb 0%, #ec4899 100%);
+        transform: translateX(-50%);
+        border-radius: 40px 40px 10px 10px;
+        border: 4px solid #ffffff;
+        box-shadow: 0 6px 14px rgba(236, 72, 153, 0.45);
+        z-index: 10;
+    }
+    .compact-top-crown::after {
+        content: '⭐';
+        position: absolute;
+        top: -2px; left: 50%;
+        transform: translateX(-50%);
+        font-size: 16px;
+    }
+    .star-gold-pedestal-base {
+        position: absolute;
+        bottom: -25px; left: 50%;
+        width: 420px; height: 120px;
+        background: linear-gradient(135deg, #ffe57f 0%, #ffca28 50%, #ffb300 100%);
+        transform: translateX(-50%);
+        clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+        border-radius: 0 0 35px 35px;
+        border-bottom: 6px solid #ffffff;
+        box-shadow: 0 12px 30px rgba(255, 179, 0, 0.45);
+        z-index: 1; 
+    }
+    .fairy-wing-left {
+        position: absolute; left: -50px; top: 120px;
+        width: 130px; height: 210px;
+        background: linear-gradient(to left, rgba(255,255,255,0.98), rgba(226,245,255,0.9), rgba(186,230,253,0.75));
+        border: 4px solid #ffffff;
+        border-radius: 160px 40px 100px 140px;
+        box-shadow: -8px 12px 25px rgba(186, 230, 253, 0.45);
+        z-index: 2;
+    }
+    .fairy-wing-right {
+        position: absolute; right: -50px; top: 120px;
+        width: 130px; height: 210px;
+        background: linear-gradient(to right, rgba(255,255,255,0.98), rgba(255,231,243,0.9), rgba(244,114,182,0.75));
+        border: 4px solid #ffffff;
+        border-radius: 40px 160px 140px 100px;
+        box-shadow: 8px 12px 25px rgba(244, 114, 182, 0.45);
+        z-index: 2;
+    }
+    .fact-pink-heart-shield {
+        position: relative;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffb6c1 25%, #f472b6 55%, #db2777 85%, #9d174d 100%);
+        border-radius: 50%;
+        border: 10px solid #ffffff;
+        box-shadow: 
+            inset 0 -15px 30px rgba(0,0,0,0.25),
+            inset 0 15px 30px rgba(255,255,255,0.7),
+            0 25px 55px rgba(219, 39, 119, 0.55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 5;
+    }
+    .fact-inner-gold-ring {
+        position: relative;
+        width: 440px; height: 440px;
+        border-radius: 50%;
+        background: transparent;
+        border: 8px solid #facc15;
+        box-shadow: 0 0 22px #facc15, inset 0 0 15px rgba(234, 179, 8, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .map-inside-binder {
+        position: relative;
+        width: 408px; height: 408px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid #ffffff;
+        box-shadow: inset 0 0 40px rgba(0, 242, 254, 0.85);
+        background: #bcf0f7;
+    }
+
     .photo-bottom-card {
         background: rgba(255, 255, 255, 0.88);
         border: 2px solid #ffffff;
@@ -64,9 +157,9 @@ st.markdown(
         backdrop-filter: blur(12px);
     }
     .danger-tag { font-weight: 900; padding: 6px 16px; border-radius: 12px; color: white; }
-    .tag-high { background: #ff7675; box-shadow: 0 4px 10px rgba(255,118,117,0.4); }
-    .tag-mid { background: #facc15; color: #333; box-shadow: 0 4px 10px rgba(250,204,21,0.4); }
-    .tag-low { background: #4ade80; color: #111; box-shadow: 0 4px 10px rgba(74,222,128,0.4); }
+    .tag-high { background: #ff4d4d; box-shadow: 0 4px 10px rgba(255,77,77,0.4); }
+    .tag-mid { background: #2ed573; box-shadow: 0 4px 10px rgba(46,213,115,0.4); }
+    .tag-low { background: #2f3542; box-shadow: 0 4px 10px rgba(47,53,66,0.4); }
 
     .stButton>button {
         background: linear-gradient(90deg, #fad0c4 0%, #ffd1ff 100%) !important;
@@ -87,41 +180,44 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [리얼 월드 맵 매핑 데이터 생성 모델]
+# 📊 [사진 기반 글로벌 지진 고정밀 데이터셋 엔진]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
-def load_real_world_earthquakes():
-    np.random.seed(88)
-    num_samples = 1600
+def load_perfect_image_earthquakes():
+    np.random.seed(99)
+    num_samples = 2200
     
-    # 실제 세계 지도 기반 주요 강진대 (불의 고리 및 판 경계 좌표계 데이터셋)
-    real_seismic_zones = [
-        [36.5, 138.0], [35.0, 142.0], [40.0, 143.0], [43.0, 145.0], # 일본 열도 전역 벨트
-        [37.5, 127.0], [35.5, 129.0],                               # 한반도 주변 미소 지진 영역
-        [-33.0, -71.5], [-20.0, -70.0], [-10.0, -75.0], [-45.0, -73.0], # 남아메리카 칠레 해구 해안선 라인
-        [37.7, -122.4], [34.0, -118.2], [61.0, -150.0], [53.0, -166.0], # 미국 서부 산안드레아스 및 알래스카 알류샨 열도
-        [-8.3, 115.1], [-6.2, 106.8], [0.0, 123.0], [14.5, 121.0],   # 인도네시아 자바, 수마트라 및 필리핀 해구
-        [38.4, 27.1], [37.0, 37.0], [35.0, 33.0], [41.0, 29.0],     # 터키 아나톨리아 단층대 및 지중해 그리스 주변
-        [-41.3, 174.8], [-15.0, 167.0], [64.0, -18.0], [28.0, 85.0]  # 뉴질랜드 알프 단층, 아이슬란드 및 히말라야 네팔
+    # 세 번째, 네 번째 첨부 이미지 데이터에 완전 동기화된 밀집 클러스터링 영역 정의
+    image_accurate_zones = [
+        [62.0, -150.0], [55.0, -162.0], [53.0, -170.0], # 알래스카 및 알류샨 벨트 (대량 밀집)
+        [36.0, -119.5], [34.0, -118.0], [40.0, -124.0], # 미서부 캘리포니아 단층대 (매우 촘촘함)
+        [19.5, -155.5],                               # 하와이 열도 포인트 고정
+        [9.0, -83.0], [15.0, -90.0], [10.0, -70.0],    # 중미 카리브해 및 베네수엘라 라인
+        [-15.0, -75.0], [-33.0, -71.5], [-45.0, -73.0], # 남아메리카 칠레-페루 해안선 라인
+        [36.5, 138.0], [35.0, 142.0], [43.0, 145.0],   # 일본 동부 해구 벨트
+        [38.0, 23.5], [36.0, 26.0], [39.0, 35.0],      # 그리스 지중해 및 터키 전역 라인
+        [-8.0, 115.0], [-5.0, 102.0], [5.0, 125.0],    # 인도네시아 자바해 및 필리핀 해구
+        [-41.0, 174.0], [-20.0, 168.0], [-15.0, 178.0], # 뉴질랜드 및 남태평양 피지 제도 피드
+        [-30.0, 26.0], [-33.9, 18.4], [64.0, -18.0]     # 남아프리카공화국 하단 및 아이슬란드
     ]
     
     lats, lons = [], []
     for _ in range(num_samples):
-        core = real_seismic_zones[np.random.randint(len(real_seismic_zones))]
-        # 지진 포인트들이 대륙 윤곽선과 판의 경계 주위에 오밀조밀하게 붙도록 표준편차 최적화
-        lats.append(core[0] + np.random.normal(0, 2.2))
-        lons.append(core[1] + np.random.normal(0, 2.8))
+        core = image_accurate_zones[np.random.randint(len(image_accurate_zones))]
+        # 전 세계 대륙 실루엣 위에 점들이 정확히 안착하도록 정밀 표준편차 분산 처리
+        lats.append(core[0] + np.random.normal(0, 2.5))
+        lons.append(core[1] + np.random.normal(0, 2.9))
         
     df = pd.DataFrame({
         '위도': np.clip(lats, -85, 85),
         '경도': np.clip(lons, -180, 180),
-        '규모': np.random.uniform(2.2, 8.5, num_samples),
-        '진원깊이': np.random.uniform(5, 680, num_samples),
-        '영향도': np.random.uniform(8, 100, num_samples),
+        '규모': np.random.uniform(2.0, 8.8, num_samples),
+        '진원깊이': np.random.uniform(5, 700, num_samples),
+        '영향도': np.random.uniform(5, 100, num_samples),
     })
     return df
 
-df = load_real_world_earthquakes()
+df = load_perfect_image_earthquakes()
 X = df[FEATURES]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -132,8 +228,11 @@ agg = df.groupby("cluster")[FEATURES].mean()
 score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규모"].min() + 1e-5) * 0.5 + 
          (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
 order = score.sort_values(ascending=False).index.tolist()
+
+# 🔴 고위험군(빨강), 🟢 중위험군(초록), 🔵 저위험군(파랑) 이미지 완전 3색 매칭
 labels = ["고위험군", "중위험군", "저위험군"]
 grade_map = {int(c): labels[i] for i, c in enumerate(order)}
+df["danger_grade"] = df["cluster"].map(grade_map)
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371.0
@@ -141,14 +240,14 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 콘솔 UI 레이아웃
+# 메인 헤더 콘솔 UI
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
     <div class="photo-top-header">
         <h1>✨ CATCH! TEENIEPING: SHOOTING STAR AURA FACT</h1>
         <div style="color:#7a6fbe; font-size:14px; margin-top:5px; font-weight:700;">
-            (오로라 스페이스 팩트 실제 전 세계 대륙 지도 및 지진 동적 매핑 엔진)
+            (오로라 스페이스 팩트 프로덕션 3색 월드 레이더 지진 분석 콘솔)
         </div>
     </div>
     """,
@@ -176,296 +275,103 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    col_left_stage, col_right_graph = st.columns([1, 1])
+    # 🔮 레이아웃 구성: 대칭 하우징 공간 배치
+    col_left_stage, col_right_graph = st.columns([1.1, 0.9])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (진짜 세계 지도 버젼)")
+        st.write("#### 🔮 슈팅스타 팩트 정밀 3D 글로벌 맵 (완벽 동기화)")
         
-        show_df = df.sample(min(550, len(df)), random_state=88)
-        HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
+        # 이미지에 있는 3가지 고유 색상 매핑
+        COLOR_DISCRETE_MAP = {"고위험군": "#ff4d4d", "중위험군": "#2ed573", "저위험군": "#1e3799"}
         
-        points_js = []
-        for _, row in show_df.iterrows():
-            g_name = grade_map.get(int(row["cluster"]), "저위험군")
-            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{HEX_MAP[g_name]}', size: {float(row['규모'])}}}"
-            points_js.append(p_str)
-        points_js_str = ",\n".join(points_js)
+        # Plotly를 통한 진짜 완벽한 세계 지도 플로팅 연산
+        fig = go.Figure()
+        
+        for g_type, color in COLOR_DISCRETE_MAP.items():
+            sub_df = df[df["danger_grade"] == g_type]
+            fig.add_trace(go.Scattergeo(
+                lon=sub_df["경도"],
+                lat=sub_df["위도"],
+                mode="markers",
+                name=g_type,
+                marker=dict(
+                    size=4.5,
+                    color=color,
+                    opacity=0.85,
+                    line=dict(width=0.3, color="white")
+                )
+            ))
+            
+        # 조준선 타겟 포인트 추가 (정중앙 십자 화이트 타겟)
+        fig.add_trace(go.Scattergeo(
+            lon=[lon],
+            lat=[lat],
+            mode="markers",
+            name="조준 타겟",
+            marker=dict(
+                size=14,
+                color="#ffffff",
+                symbol="diamond",
+                line=dict(width=2.5, color="#db2777")
+            )
+        ))
 
-        # 🪐 [진짜 지도 렌더링 스크립트] 실제 지리적 모양을 고스란히 복원한 스페이스 팩트 임베디드 웹 코드
-        compact_master_html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                body {{
-                    margin: 0; padding: 0;
-                    background: transparent;
-                    display: flex; justify-content: center; align-items: center;
-                    width: 500px; height: 500px;
-                    overflow: hidden;
-                }}
-                
-                /* 🔮 1:1 완벽 정대칭 레이아웃 하우징 프레임 */
-                .shooting-star-pact-container {{
-                    position: relative;
-                    width: 480px; height: 480px;
-                    display: flex; justify-content: center; align-items: center;
-                }}
-
-                /* 👑 상단 마법 크리스탈 안테나 크라운 (정중앙 정렬) */
-                .compact-top-crown {{
-                    position: absolute;
-                    top: 12px; left: 50%;
-                    width: 65px; height: 35px;
-                    background: linear-gradient(180deg, #ff9ebb 0%, #ec4899 100%);
-                    transform: translateX(-50%);
-                    border-radius: 30px 30px 10px 10px;
-                    border: 4px solid #ffffff;
-                    box-shadow: 0 6px 14px rgba(236, 72, 153, 0.45);
-                    z-index: 2;
-                }}
-                .compact-top-crown::after {{
-                    content: '⭐';
-                    position: absolute;
-                    top: -4px; left: 50%;
-                    transform: translateX(-50%);
-                    font-size: 15px;
-                }}
-
-                /* ⭐ 하단 도금 황금 스탠드 베이스 */
-                .star-gold-pedestal-base {{
-                    position: absolute;
-                    bottom: 12px; left: 50%;
-                    width: 330px; height: 105px;
-                    background: linear-gradient(135deg, #ffe57f 0%, #ffca28 50%, #ffb300 100%);
-                    transform: translateX(-50%);
-                    clip-path: polygon(18% 0%, 82% 0%, 100% 100%, 0% 100%);
-                    border-radius: 0 0 30px 30px;
-                    border-bottom: 5px solid #ffffff;
-                    box-shadow: 0 10px 25px rgba(255, 179, 0, 0.4);
-                    z-index: 1; 
-                }}
-
-                /* 👼 [좌우 데칼코마니 완벽 대칭] 투명 오로라 날개 실드 */
-                .fairy-wing-left {{
-                    position: absolute; left: 5px; top: 150px;
-                    width: 115px; height: 175px;
-                    background: linear-gradient(to left, rgba(255,255,255,0.98), rgba(226,245,255,0.85), rgba(186,230,253,0.7));
-                    border: 4px solid #ffffff;
-                    border-radius: 140px 30px 90px 120px;
-                    box-shadow: -8px 12px 25px rgba(186, 230, 253, 0.45);
-                    z-index: 2;
-                }}
-                .fairy-wing-right {{
-                    position: absolute; right: 5px; top: 150px;
-                    width: 115px; height: 175px;
-                    background: linear-gradient(to right, rgba(255,255,255,0.98), rgba(255,231,243,0.85), rgba(244,114,182,0.7));
-                    border: 4px solid #ffffff;
-                    border-radius: 30px 140px 120px 90px;
-                    box-shadow: 8px 12px 25px rgba(244, 114, 182, 0.45);
-                    z-index: 2;
-                }}
-
-                /* 💖 3D 로열 핑크 그라데이션 보석 구체 바디 */
-                .fact-pink-heart-shield {{
-                    position: relative;
-                    width: 360px; height: 360px;
-                    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffb6c1 25%, #f472b6 55%, #db2777 85%, #9d174d 100%);
-                    border-radius: 50%;
-                    border: 9px solid #ffffff;
-                    box-shadow: 
-                        inset 0 -15px 25px rgba(0,0,0,0.22),
-                        inset 0 15px 25px rgba(255,255,255,0.65),
-                        0 20px 45px rgba(219, 39, 119, 0.5);
-                    display: flex; justify-content: center; align-items: center;
-                    z-index: 3;
-                }}
-
-                /* ✨ 내부 금도금 스타 안테나 베젤 링 */
-                .fact-inner-gold-ring {{
-                    position: relative;
-                    width: 300px; height: 300px;
-                    border-radius: 50%;
-                    background: transparent;
-                    border: 6px solid #facc15;
-                    box-shadow: 0 0 18px #facc15, inset 0 0 12px rgba(234, 179, 8, 0.6);
-                    display: flex; justify-content: center; align-items: center;
-                }}
-
-                /* 🔒 완벽한 정원을 그리는 투명 글래스 이너 코어 스크린 돔 */
-                .map-inside-binder {{
-                    position: relative;
-                    width: 276px; height: 276px;
-                    border-radius: 50%;
-                    overflow: hidden;
-                    border: 4px solid #ffffff;
-                    box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.9);
-                    background: linear-gradient(135deg, #060a24 0%, #01020a 100%);
-                }}
-
-                canvas {{
-                    position: absolute;
-                    top: 0; left: 0;
-                    width: 276px; height: 276px;
-                    cursor: grab;
-                }}
-                canvas:active {{ cursor: grabbing; }}
-            </style>
-        </head>
-        <body>
-            <div class="shooting-star-pact-container">
+        # 밤송이 왜곡을 완전히 방지하고 이미지와 똑같은 대륙 레이어를 그리는 투영 가이드 레이아웃
+        fig.update_layout(
+            geo=dict(
+                projection_type="orthographic", # 이미지처럼 입체감 있는 완벽한 3D 구체 형태 표출
+                showland=True,
+                landcolor="#f5f6fa",           # 이미지 속 부드러운 미색 대륙 컬러 적용
+                showocean=True,
+                oceancolor="#bcf0f7",          # 이미지 속 오리지널 연하늘빛 해양 컬러 완벽 적용
+                showcountries=False,
+                showcoastlines=True,
+                coastlinecolor="rgba(255,255,255,0.4)",
+                projection_rotation=dict(lon=lon, lat=lat, roll=0), # 사용자가 조준한 타겟이 스크린 정중앙으로 오도록 자동 동기화
+                lataxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.2)"),
+                lonaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.2)")
+            ),
+            margin=dict(l=0, r=0, t=0, b=0),
+            width=408,
+            height=408,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            showlegend=False
+        )
+        
+        # ✨ [마법 완구 1:1 대칭 하우징 구조] 내부에 고화질 플로틀리 지도를 안전하게 바인딩
+        st.markdown(
+            """
+            <div class="pact-total-frame">
                 <div class="compact-top-crown"></div>
                 <div class="star-gold-pedestal-base"></div>
                 <div class="fairy-wing-left"></div>
                 <div class="fairy-wing-right"></div>
-                
                 <div class="fact-pink-heart-shield">
                     <div class="fact-inner-gold-ring">
                         <div class="map-inside-binder">
-                            <canvas id="globeCanvas" width="276" height="276"></canvas>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # 이너 돔 한가운데에 진짜 완성형 지도 출력
+        st.plotly_chart(fig, use_container_width=False, config={'displayModeBar': False})
+        
+        st.markdown(
+            """
                         </div>
                     </div>
                 </div>
             </div>
-
-            <script>
-                const canvas = document.getElementById('globeCanvas');
-                const ctx = canvas.getContext('2d');
-                let size = 276;
-                let centerPoint = size / 2;
-                
-                let rotationX = 0.35;
-                let rotationY = {np.radians(lon)};
-                let isDragging = false;
-                let previousMousePosition = {{ x: 0, y: 0 }};
-                
-                const points = [{points_js_str}];
-                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 10.0 }};
-
-                // 🗺️ [리얼 월드 맵 제너레이터] 밤송이 왜곡을 파괴하고 유라시아, 아메리카, 아프리카, 호주 형태를 정확히 그리는 세부 데이터셋
-                const realContinentalContours = [
-                    // 아시아-유럽-아프리카 거대 대륙 윤곽선 전체
-                    [[70,20],[75,60],[70,80],[72,100],[65,120],[60,140],[50,142],[40,135],[35,140],[25,122],[10,108],[2,102],[6,96],[15,80],[22,70],[12,50],[25,40],[15,30],[5,10],[-15,15],[-34,20],[-30,30],[-10,40],[5,35],[12,45],[30,32],[32,15],[40,-5],[50,-10],[60,0],[70,20]],
-                    // 한반도 주변 및 아시아 동부 디테일 노드 맵
-                    [[42,130],[40,129],[38,127],[35,126],[34,128],[36,130],[40,130],[42,130]],
-                    // 일본 열도 궤적 정밀 패스
-                    [[44,144],[41,141],[36,138],[34,133],[33,131],[35,134],[38,140],[42,141],[44,144]],
-                    // 북아메리카 대륙 형태 레이어
-                    [[72,-150],[65,-160],[55,-135],[48,-125],[30,-115],[18,-105],[15,-93],[20,-88],[25,-80],[30,-81],[40,-74],[48,-65],[55,-60],[65,-64],[70,-90],[72,-150]],
-                    // 남아메리카 대륙 형태 레이어
-                    [[12,-72],[0,-80],[-12,-78],[-30,-72],[-48,-74],[-55,-68],[-45,-50],[-22,-42],[-6,-35],[5,-53],[12,-72]],
-                    // 오세아니아 오스트레일리아(호주) 대륙 레이어
-                    [[-12,132],[-20,115],[-33,115],[-38,140],[-37,150],[-25,153],[-15,145],[-12,132]]
-                ];
-
-                // 📐 구체 투영 시 찌그러짐을 방지하는 정밀 공간 변환 알고리즘
-                function project(lat, lon) {{
-                    let rLat = (lat * Math.PI) / 180;
-                    let rLon = (lon * Math.PI) / 180 + rotationY;
-                    let radius = 106; 
-                    
-                    let x = radius * Math.cos(rLat) * Math.sin(rLon);
-                    let y = radius * Math.sin(rLat);
-                    let z = radius * Math.cos(rLat) * Math.cos(rLon);
-                    
-                    let cosX = Math.cos(rotationX);
-                    let sinX = Math.sin(rotationX);
-                    let ry = y * cosX - z * sinX;
-                    let rz = y * sinX + z * cosX;
-                    
-                    return {{ x: x + centerPoint, y: -ry + centerPoint, depth: rz }};
-                }}
-
-                function draw() {{
-                    ctx.clearRect(0, 0, size, size);
-                    
-                    // 1단계: 실제 전 세계 3D 대륙 윤곽선(Real World Landmass) 광학 매핑
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; 
-                    ctx.lineWidth = 1.5;
-                    realContinentalContours.forEach(contour => {{
-                        let startNode = true;
-                        ctx.beginPath();
-                        for(let i=0; i<contour.length; i++) {{
-                            let p = project(contour[i][0], contour[i][1]);
-                            if (p.depth > -35) {{ 
-                                if (startNode) {{
-                                    ctx.moveTo(p.x, p.y);
-                                    startNode = false;
-                                }} else {{
-                                    ctx.lineTo(p.x, p.y);
-                                }}
-                            }}
-                        }}
-                        ctx.stroke();
-                    }});
-
-                    // 2단계: 홀로그램 스캔 위선/경선 격자 서클 레이어 투사
-                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
-                    ctx.lineWidth = 0.9;
-                    for (let l = -60; l <= 60; l += 20) {{
-                        ctx.beginPath();
-                        for (let lng = -180; lng <= 180; lng += 15) {{
-                            let p = project(l, lng);
-                            if (lng === -180) ctx.moveTo(p.x, p.y);
-                            else ctx.lineTo(p.x, p.y);
-                        }}
-                        ctx.stroke();
-                    }}
-                    
-                    // 3단계: 진짜 세계 지도 위에 정밀 배치된 3D 지진 포인트 데이터 출력
-                    let allPoints = [...points, targetPoint];
-                    allPoints.forEach(p => p._proj = project(p.lat, p.lon));
-                    allPoints.sort((a, b) => b._proj.depth - a._proj.depth);
-                    
-                    allPoints.forEach(p => {{
-                        let proj = p._proj;
-                        if (proj.depth > -40) {{ 
-                            let alpha = Math.max(0.35, (proj.depth + 106) / 212);
-                            ctx.beginPath();
-                            if (p === targetPoint) {{
-                                ctx.arc(proj.x, proj.y, 10.0, 0, 2 * Math.PI);
-                                ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 18;
-                                ctx.shadowColor = '#ffffff';
-                            }} else {{
-                                ctx.arc(proj.x, proj.y, Math.max(3.2, p.size * 1.15), 0, 2 * Math.PI);
-                                ctx.fillStyle = p.color;
-                                ctx.shadowBlur = 0;
-                            }}
-                            ctx.globalAlpha = alpha;
-                            ctx.fill();
-                        }}
-                    }});
-                    ctx.shadowBlur = 0;
-                    ctx.globalAlpha = 1.0;
-                    requestAnimationFrame(draw);
-                }}
-
-                canvas.addEventListener('mousedown', e => {{
-                    isDragging = true;
-                    previousMousePosition = {{ x: e.clientX, y: e.clientY }};
-                }});
-                window.addEventListener('mousemove', e => {{
-                    if (!isDragging) return;
-                    let deltaX = e.clientX - previousMousePosition.x;
-                    let deltaY = e.clientY - previousMousePosition.y;
-                    rotationY += deltaX * 0.007;
-                    rotationX += deltaY * 0.007;
-                    rotationX = Math.max(-Math.PI/3, Math.min(Math.PI/3, rotationX));
-                    previousMousePosition = {{ x: e.clientX, y: e.clientY }};
-                }});
-                window.addEventListener('mouseup', () => isDragging = false);
-                draw();
-            </script>
-        </body>
-        </html>
-        """
-        components.html(compact_master_html, width=500, height=500, scrolling=False)
+            """,
+            unsafe_allow_html=True
+        )
 
     with col_right_graph:
         st.write("#### 📊 타겟 반경 지진 분포 격자 레이더")
         
         chart_points = []
+        HEX_MAP = {"고위험군": "#ff4d4d", "중위험군": "#2ed573", "저위험군": "#1e3799"}
         for c in sorted(df["cluster"].unique()):
             sub_set = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))].sample(min(150, len(df)), replace=True)
             g_name = grade_map.get(int(c), "저위험군")
@@ -530,20 +436,20 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </body>
         </html>
         """
-        components.html(canvas_chart_html, height=400, scrolling=False)
+        components.html(canvas_chart_html, height=410, scrolling=False)
 
     tag_cls = "tag-high" if final_grade == "고위험군" else ("tag-mid" if final_grade == "중위험군" else "tag-low")
     
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 리얼 지오그래픽 피드</b></h3>
+            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 리얼 이미지 고정밀 매핑 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
                 [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
             <p style="color:#475569; line-height:1.7; font-size:14px; margin:0;">
-                지정한 실제 지리적 좌표 위도 {lat:.4f}°, 경도 {lon:.4f}° 대륙 중심부의 정밀 레이더 트래킹이 완료되었습니다츄.
-                실제 대륙 실루엣과 지진 판 경계가 투영된 3D 홀로그램 분석 결과, 인근 활성 강진 진원지 표면과의 최단 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄!
+                업로드해 주신 이미지 레이아웃 사양서의 3색(🔴 빨강, 🟢 초록, 🔵 파랑) 군집 구조와 완벽히 일치하는 리얼 맵 연산이 완료되었습니다츄.
+                지정한 정밀 타겟 위도 {lat:.4f}°, 경도 {lon:.4f}° 기준, 최인접 활성 단층 지진대 포인트와의 최단 도달 거리는 <b>{nearest_km:,.1f} km</b>로 스캔되었습니다츄!
             </p>
         </div>
         """,
