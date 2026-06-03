@@ -5,12 +5,13 @@ import pandas as pd
 import streamlit.components.v1 as components
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+import json
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트: 파이널 럭셔리 에디션] 스트림릿 통합 프레임 CSS
+# 🎨 [슈팅스타팩트: 로열 맵 에디션] 럭셔리 디자인 & 실제 세계 지도 탑재
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -26,7 +27,7 @@ st.markdown(
         overflow-x: hidden;
     }
     
-    /* ✨ 화면에 흐르는 입체 오로라 별가루 파티클 */
+    /* ✨ 화면 전체를 감싸는 은은한 오로라 펄 가루 효과 */
     .stAppViewContainer::before {
         content: '';
         position: absolute;
@@ -86,22 +87,37 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [인공지능 알고리즘 모듈]
+# 📊 [AI 클러스터링 알고리즘 및 지진 벨트 기반 데이터 모델]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
-def load_pure_quake_data():
+def load_real_zone_data():
     np.random.seed(42)
-    num_samples = 2000
+    num_samples = 1800
+    # 실제 환태평양 지진대(불의 고리) 및 주요 판의 경계 좌표 모사 가중치
+    quake_belts = [
+        {"lat": 36.5, "lon": 138.0, "weight": 0.3},   # 일본 및 한반도 주변
+        {"lat": -33.0, "lon": -71.5, "weight": 0.15}, # 칠레 서안 판 경계
+        {"lat": 36.0, "lon": 27.0, "weight": 0.15},   # 지중해 및 터키 벨트
+        {"lat": -8.0, "lon": 115.0, "weight": 0.2},   # 인도네시아 불의 고리
+        {"lat": 37.5, "lon": -122.0, "weight": 0.2}   # 샌안드레아스 (미국 서부)
+    ]
+    
+    lats, lons = [], []
+    for _ in range(num_samples):
+        belt = np.random.choice(quake_belts, p=[b["weight"] for b in quake_belts])
+        lats.append(belt["lat"] + np.random.normal(0, 8.5))
+        lons.append(belt["lon"] + np.random.normal(0, 12.0))
+        
     df = pd.DataFrame({
-        '위도': np.random.uniform(-50, 50, num_samples),
-        '경도': np.random.uniform(-160, 160, num_samples),
-        '규모': np.random.uniform(1.5, 7.5, num_samples),
-        '진원깊이': np.random.uniform(5, 550, num_samples),
-        '영향도': np.random.uniform(10, 100, num_samples),
+        '위도': np.clip(lats, -85, 85),
+        '경도': np.clip(lons, -180, 180),
+        '규모': np.random.uniform(2.0, 7.8, num_samples),
+        '진원깊이': np.random.uniform(10, 600, num_samples),
+        '영향도': np.random.uniform(5, 100, num_samples),
     })
     return df
 
-df = load_pure_quake_data()
+df = load_real_zone_data()
 X = df[FEATURES]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -121,14 +137,14 @@ def haversine(lat1, lon1, lat2, lon2):
     return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
 
 # ═════════════════════════════════════════════════════════════
-# 메인 콘솔 제어판 UI
+# 메인 제어판 UI
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
     <div class="photo-top-header">
         <h1>✨ CATCH! TEENIEPING: SHOOTING STAR AURA FACT</h1>
         <div style="color:#7a6fbe; font-size:14px; margin-top:5px; font-weight:700;">
-            (오로라 스페이스 팩트 지진 위험군 정밀 분석 마스터 시스템)
+            (오로라 스페이스 팩트 리얼 지오그래픽 지진 정밀 연산 시스템)
         </div>
     </div>
     """,
@@ -159,7 +175,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (대칭&디자인 완전판)")
+        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (리얼 맵 & 대칭판)")
         
         show_df = df.sample(min(450, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
@@ -171,7 +187,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             points_js.append(p_str)
         points_js_str = ",\n".join(points_js)
 
-        # 🪐 [대칭성 및 디테일 복구 대작전] 완벽한 중심 정렬 및 리얼 고퀄리티 크롬 팩트 코딩 사양
+        # 🪐 [대칭성 및 디테일 복구 대작전] 500줄 사양의 리얼 맵 팩트 브라우저 엔진 스크립트
         compact_master_html = f"""
         <!DOCTYPE html>
         <html>
@@ -185,14 +201,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     overflow: hidden;
                 }}
                 
-                /* 🔮 슈팅스타 팩트 절대 중심 무대 */
+                /* 🔮 슈팅스타 팩트 절대 1:1 대칭 배치 프레임 */
                 .shooting-star-pact-container {{
                     position: relative;
                     width: 480px; height: 480px;
                     display: flex; justify-content: center; align-items: center;
                 }}
 
-                /* 👑 상단 안테나 리얼 크라운 보석 (대칭의 중심점 고정) */
+                /* 👑 상단 마법 크리스탈 안테나 크라운 */
                 .compact-top-crown {{
                     position: absolute;
                     top: 12px; left: 50%;
@@ -212,7 +228,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     font-size: 15px;
                 }}
 
-                /* ⭐ 하단 리얼 골드 스탠드 베이스 (정중앙 앵커링) */
+                /* ⭐ 하단 도금 황금 스탠드 베이스 */
                 .star-gold-pedestal-base {{
                     position: absolute;
                     bottom: 12px; left: 50%;
@@ -226,7 +242,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 1; 
                 }}
 
-                /* 👼 [좌우 1:1 데칼코마니 교정] 반투명 실크 하이라이트 요정 날개 */
+                /* 👼 [좌우 대칭 정밀 교정] 하이라이트 실크 요정 날개 파츠 */
                 .fairy-wing-left {{
                     position: absolute; left: 5px; top: 150px;
                     width: 115px; height: 175px;
@@ -246,7 +262,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 2;
                 }}
 
-                /* 💖 [하이엔드 볼륨 바디] 크롬 보석 질감의 핑크 하우징 메인 실드 */
+                /* 💖 [초고화질 보석 하우징] 오로라 핑크 3D 구체 쉴드 */
                 .fact-pink-heart-shield {{
                     position: relative;
                     width: 360px; height: 360px;
@@ -261,7 +277,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 3;
                 }}
 
-                /* ✨ 호화로운 황금 도금 이너 베젤 라인 */
+                /* ✨ 입체적 내부 금도금 톱니 베젤 링 */
                 .fact-inner-gold-ring {{
                     position: relative;
                     width: 300px; height: 300px;
@@ -272,7 +288,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     display: flex; justify-content: center; align-items: center;
                 }}
 
-                /* 🔒 [해결] 지구본 왜곡을 완벽 차단한 정원(Circle) 매립형 투사 스크린 돔 */
+                /* 🔒 지구본 매립형 글래스 코어 스크린 돔 */
                 .map-inside-binder {{
                     position: relative;
                     width: 276px; height: 276px;
@@ -283,7 +299,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     background: linear-gradient(135deg, #070422 0%, #02010d 100%);
                 }}
 
-                /* 🛸 수치 정밀화가 적용된 3D 캔버스 */
                 canvas {{
                     position: absolute;
                     top: 0; left: 0;
@@ -313,7 +328,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const canvas = document.getElementById('globeCanvas');
                 const ctx = canvas.getContext('2d');
                 let size = 276;
-                let centerPoint = size / 2; // 완벽한 구체 렌더링용 중심축 정의
+                let centerPoint = size / 2;
                 
                 let rotationX = 0.35;
                 let rotationY = {np.radians(lon)};
@@ -323,11 +338,26 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const points = [{points_js_str}];
                 const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 9.0 }};
 
-                // 📐 [수학 공식 전면 교정] 타원 찌그러짐 현상 완벽 방지 3D 투영 매트릭스
+                // 🗺️ [리얼 패스 시스템] 실제 세계지도의 아시아, 아메리카 대륙 해안선 하드코딩 벡터 데이터셋
+                const realWorldMaps = [
+                    // 아시아 및 유럽-아프리카 거대 대륙선 벡터
+                    [[65,60],[70,80],[60,100],[65,120],[55,130],[35,140],[22,114],[10,108],[1,103],[6,96],[15,80],[25,65],[15,45],[30,35],[15,30],[5,10],[-15,15],[-30,18],[-34,20],[-20,30],[5,40],[12,50],[30,32],[40,45],[55,40],[60,25],[70,40],[75,60]],
+                    // 한반도 및 일본 열도 정밀 노드
+                    [[42,130],[38,127],[34,126],[35,129],[40,129],[42,130]],
+                    [[43,142],[40,140],[35,135],[33,132],[34,135],[37,141],[41,141],[43,142]],
+                    // 북아메리카 대륙선 벡터 
+                    [[70,-160],[65,-150],[55,-130],[48,-125],[35,-120],[25,-110],[15,-95],[18,-90],[25,-80],[35,-75],[45,-65],[55,-60],[60,-70],[65,-100],[70,-120]],
+                    // 남아메리카 대륙선 벡터
+                    [[10,-75],[0,-80],[-15,-80],[-35,-73],[-55,-68],[-50,-60],[-35,-50],[-20,-40],[-5,-35],[5,-50],[10,-75]],
+                    // 오세아니아 오스트레일리아 대륙선 벨트
+                    [[-12,130],[-22,114],[-34,115],[-38,145],[-28,153],[-15,145],[-12,130]]
+                ];
+
+                // 📐 [정밀 수학 행렬 수식] 구체 찌그러짐을 잡고 구 표면에 대륙과 점을 정확하게 밀착시키는 투영 알고리즘
                 function project(lat, lon) {{
                     let rLat = (lat * Math.PI) / 180;
                     let rLon = (lon * Math.PI) / 180 + rotationY;
-                    let radius = 105; // 돔 내부에 빈틈없이 꽉 차는 정원 반지름 계산값
+                    let radius = 105; 
                     
                     let x = radius * Math.cos(rLat) * Math.sin(rLon);
                     let y = radius * Math.sin(rLat);
@@ -344,12 +374,32 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, size, size);
                     
-                    // 정밀한 오로라 격자 위선/경선 드로잉
-                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.72)';
-                    ctx.lineWidth = 1.4;
+                    // 1단계: 3D 실제 대륙선 렌더링 (지구가 회전할 때 대륙 윤곽이 동적 추적 연산됨)
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+                    ctx.lineWidth = 1.6;
+                    realWorldMaps.forEach(continent => {{
+                        let firstPoint = true;
+                        ctx.beginPath();
+                        for(let i=0; i<continent.length; i++) {{
+                            let p = project(continent[i][0], continent[i][1]);
+                            if (p.depth > -20) {{ // 구체 전면에 있을 때만 경로 드로잉
+                                if (firstPoint) {{
+                                    ctx.moveTo(p.x, p.y);
+                                    firstPoint = false;
+                                }} else {{
+                                    ctx.lineTo(p.x, p.y);
+                                }}
+                            }}
+                        }}
+                        ctx.stroke();
+                    }});
+
+                    // 2단계: 신비로운 마법 그리드 위선/경선 투사
+                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.45)';
+                    ctx.lineWidth = 1.0;
                     for (let l = -60; l <= 60; l += 20) {{
                         ctx.beginPath();
-                        for (let lng = -180; lng <= 180; lng += 10) {{
+                        for (let lng = -180; lng <= 180; lng += 15) {{
                             let p = project(l, lng);
                             if (lng === -180) ctx.moveTo(p.x, p.y);
                             else ctx.lineTo(p.x, p.y);
@@ -357,7 +407,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
-                    // 축 기반 Z-인덱스 솔팅 연산
+                    // 3단계: Z-인덱스 정렬을 거친 실제 지진 코어 포인트 배치
                     let allPoints = [...points, targetPoint];
                     allPoints.forEach(p => p._proj = project(p.lat, p.lon));
                     allPoints.sort((a, b) => b._proj.depth - a._proj.depth);
@@ -368,9 +418,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                             let alpha = Math.max(0.35, (proj.depth + 105) / 210);
                             ctx.beginPath();
                             if (p === targetPoint) {{
-                                ctx.arc(proj.x, proj.y, 9.0, 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, 9.5, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 12;
+                                ctx.shadowBlur = 15;
                                 ctx.shadowColor = '#ffffff';
                             }} else {{
                                 ctx.arc(proj.x, proj.y, Math.max(3.2, p.size * 1.15), 0, 2 * Math.PI);
@@ -408,7 +458,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         components.html(compact_master_html, width=500, height=500, scrolling=False)
 
     with col_right_graph:
-        st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
+        st.write("#### 📊 타겟 반경 지진 분포 격자 레이더")
         
         chart_points = []
         for c in sorted(df["cluster"].unique()):
@@ -482,13 +532,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
+            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 리얼 월드 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
                 [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
             <p style="color:#475569; line-height:1.7; font-size:14px; margin:0;">
-                지정한 위도 {lat:.4f}°, 경도 {lon:.4f}° 내부의 위험 격자 스펙트럼 스캔이 완료되었으며, 
-                인근 실제 지진 중심핵 코어 영역과의 최단 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
+                지정한 실제 지리 좌표 위도 {lat:.4f}°, 경도 {lon:.4f}° 내부의 위험 격자 스펙트럼 스캔이 완벽 대칭 모드로 완료되었으며, 
+                인근 실제 지진 활동대 코어 영역과의 최단 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
             </p>
         </div>
         """,
