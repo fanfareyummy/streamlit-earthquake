@@ -5,12 +5,13 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import plotly.graph_objects as go
+import streamlit.components.v1 as components  # 👈 누락되었던 컴포넌트 복구!
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트: 리얼 플로틀리 매핑 에디션] 3색 지진 완벽 동기화
+# 🎨 [슈팅스타팩트: 최종 안정화 에디션] 3색 지진 완벽 동기화
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -159,7 +160,7 @@ st.markdown(
     .danger-tag { font-weight: 900; padding: 6px 16px; border-radius: 12px; color: white; }
     .tag-high { background: #ff4d4d; box-shadow: 0 4px 10px rgba(255,77,77,0.4); }
     .tag-mid { background: #2ed573; box-shadow: 0 4px 10px rgba(46,213,115,0.4); }
-    .tag-low { background: #2f3542; box-shadow: 0 4px 10px rgba(47,53,66,0.4); }
+    .tag-low { background: #1e3799; box-shadow: 0 4px 10px rgba(30,55,153,0.4); }
 
     .stButton>button {
         background: linear-gradient(90deg, #fad0c4 0%, #ffd1ff 100%) !important;
@@ -187,24 +188,22 @@ def load_perfect_image_earthquakes():
     np.random.seed(99)
     num_samples = 2200
     
-    # 세 번째, 네 번째 첨부 이미지 데이터에 완전 동기화된 밀집 클러스터링 영역 정의
     image_accurate_zones = [
-        [62.0, -150.0], [55.0, -162.0], [53.0, -170.0], # 알래스카 및 알류샨 벨트 (대량 밀집)
-        [36.0, -119.5], [34.0, -118.0], [40.0, -124.0], # 미서부 캘리포니아 단층대 (매우 촘촘함)
-        [19.5, -155.5],                               # 하와이 열도 포인트 고정
-        [9.0, -83.0], [15.0, -90.0], [10.0, -70.0],    # 중미 카리브해 및 베네수엘라 라인
-        [-15.0, -75.0], [-33.0, -71.5], [-45.0, -73.0], # 남아메리카 칠레-페루 해안선 라인
-        [36.5, 138.0], [35.0, 142.0], [43.0, 145.0],   # 일본 동부 해구 벨트
-        [38.0, 23.5], [36.0, 26.0], [39.0, 35.0],      # 그리스 지중해 및 터키 전역 라인
-        [-8.0, 115.0], [-5.0, 102.0], [5.0, 125.0],    # 인도네시아 자바해 및 필리핀 해구
-        [-41.0, 174.0], [-20.0, 168.0], [-15.0, 178.0], # 뉴질랜드 및 남태평양 피지 제도 피드
-        [-30.0, 26.0], [-33.9, 18.4], [64.0, -18.0]     # 남아프리카공화국 하단 및 아이슬란드
+        [62.0, -150.0], [55.0, -162.0], [53.0, -170.0], 
+        [36.0, -119.5], [34.0, -118.0], [40.0, -124.0], 
+        [19.5, -155.5],                               
+        [9.0, -83.0], [15.0, -90.0], [10.0, -70.0],    
+        [-15.0, -75.0], [-33.0, -71.5], [-45.0, -73.0], 
+        [36.5, 138.0], [35.0, 142.0], [43.0, 145.0],   
+        [38.0, 23.5], [36.0, 26.0], [39.0, 35.0],      
+        [-8.0, 115.0], [-5.0, 102.0], [5.0, 125.0],    
+        [-41.0, 174.0], [-20.0, 168.0], [-15.0, 178.0], 
+        [-30.0, 26.0], [-33.9, 18.4], [64.0, -18.0]     
     ]
     
     lats, lons = [], []
     for _ in range(num_samples):
         core = image_accurate_zones[np.random.randint(len(image_accurate_zones))]
-        # 전 세계 대륙 실루엣 위에 점들이 정확히 안착하도록 정밀 표준편차 분산 처리
         lats.append(core[0] + np.random.normal(0, 2.5))
         lons.append(core[1] + np.random.normal(0, 2.9))
         
@@ -229,7 +228,6 @@ score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규
          (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
 order = score.sort_values(ascending=False).index.tolist()
 
-# 🔴 고위험군(빨강), 🟢 중위험군(초록), 🔵 저위험군(파랑) 이미지 완전 3색 매칭
 labels = ["고위험군", "중위험군", "저위험군"]
 grade_map = {int(c): labels[i] for i, c in enumerate(order)}
 df["danger_grade"] = df["cluster"].map(grade_map)
@@ -275,16 +273,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     dom_cluster = int(max(cw, key=cw.get))
     final_grade = grade_map.get(dom_cluster, "저위험군")
 
-    # 🔮 레이아웃 구성: 대칭 하우징 공간 배치
     col_left_stage, col_right_graph = st.columns([1.1, 0.9])
     
     with col_left_stage:
         st.write("#### 🔮 슈팅스타 팩트 정밀 3D 글로벌 맵 (완벽 동기화)")
         
-        # 이미지에 있는 3가지 고유 색상 매핑
         COLOR_DISCRETE_MAP = {"고위험군": "#ff4d4d", "중위험군": "#2ed573", "저위험군": "#1e3799"}
         
-        # Plotly를 통한 진짜 완벽한 세계 지도 플로팅 연산
         fig = go.Figure()
         
         for g_type, color in COLOR_DISCRETE_MAP.items():
@@ -302,7 +297,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 )
             ))
             
-        # 조준선 타겟 포인트 추가 (정중앙 십자 화이트 타겟)
         fig.add_trace(go.Scattergeo(
             lon=[lon],
             lat=[lat],
@@ -316,18 +310,17 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             )
         ))
 
-        # 밤송이 왜곡을 완전히 방지하고 이미지와 똑같은 대륙 레이어를 그리는 투영 가이드 레이아웃
         fig.update_layout(
             geo=dict(
-                projection_type="orthographic", # 이미지처럼 입체감 있는 완벽한 3D 구체 형태 표출
+                projection_type="orthographic", 
                 showland=True,
-                landcolor="#f5f6fa",           # 이미지 속 부드러운 미색 대륙 컬러 적용
+                landcolor="#f5f6fa",           
                 showocean=True,
-                oceancolor="#bcf0f7",          # 이미지 속 오리지널 연하늘빛 해양 컬러 완벽 적용
+                oceancolor="#bcf0f7",          
                 showcountries=False,
                 showcoastlines=True,
                 coastlinecolor="rgba(255,255,255,0.4)",
-                projection_rotation=dict(lon=lon, lat=lat, roll=0), # 사용자가 조준한 타겟이 스크린 정중앙으로 오도록 자동 동기화
+                projection_rotation=dict(lon=lon, lat=lat, roll=0), 
                 lataxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.2)"),
                 lonaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.2)")
             ),
@@ -339,7 +332,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             showlegend=False
         )
         
-        # ✨ [마법 완구 1:1 대칭 하우징 구조] 내부에 고화질 플로틀리 지도를 안전하게 바인딩
         st.markdown(
             """
             <div class="pact-total-frame">
@@ -354,7 +346,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             unsafe_allow_html=True
         )
         
-        # 이너 돔 한가운데에 진짜 완성형 지도 출력
         st.plotly_chart(fig, use_container_width=False, config={'displayModeBar': False})
         
         st.markdown(
