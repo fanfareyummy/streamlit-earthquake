@@ -11,7 +11,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트: 텍토닉 마스터 에디션] 럭셔리 완구 디자인 & 리얼 지진대 탑재
+# 🎨 [슈팅스타팩트: 리얼 콘투어 맵 에디션] 완벽 대칭 & 실제 세계 지도 탑재
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -87,39 +87,41 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [리얼 지진학 데이터 모델 모듈]
+# 📊 [리얼 월드 맵 매핑 데이터 생성 모델]
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
-def load_plate_boundary_earthquakes():
-    np.random.seed(77)
-    num_samples = 1500
+def load_real_world_earthquakes():
+    np.random.seed(88)
+    num_samples = 1600
     
-    # 실제 지구의 핵심 지진대 및 판의 경계 궤적 (불의 고리 노드 세트)
-    # [위도, 경도] 순서 리스트
-    ring_of_fire_nodes = [
-        [36.5, 138.0], [40.0, 143.0], [52.0, 160.0], [55.0, -160.0], [60.0, -140.0], # 쿠릴-알류샨 가호
-        [45.0, -125.0], [35.0, -120.0], [20.0, -105.0], [10.0, -85.0], [-15.0, -75.0], [-35.0, -72.0], # 미서부-칠레 해구
-        [-45.0, 165.0], [-20.0, 175.0], [-5.0, 150.0], [-2.0, 120.0], [5.0, 125.0], [15.0, 120.0], # 오세아니아-필리핀
-        [-8.0, 110.0], [-6.0, 100.0], [25.0, 95.0], [35.0, 75.0], [37.0, 45.0], [38.0, 25.0] # 인도네시아-알프스-터키
+    # 실제 세계 지도 기반 주요 강진대 (불의 고리 및 판 경계 좌표계 데이터셋)
+    real_seismic_zones = [
+        [36.5, 138.0], [35.0, 142.0], [40.0, 143.0], [43.0, 145.0], # 일본 열도 전역 벨트
+        [37.5, 127.0], [35.5, 129.0],                               # 한반도 주변 미소 지진 영역
+        [-33.0, -71.5], [-20.0, -70.0], [-10.0, -75.0], [-45.0, -73.0], # 남아메리카 칠레 해구 해안선 라인
+        [37.7, -122.4], [34.0, -118.2], [61.0, -150.0], [53.0, -166.0], # 미국 서부 산안드레아스 및 알래스카 알류샨 열도
+        [-8.3, 115.1], [-6.2, 106.8], [0.0, 123.0], [14.5, 121.0],   # 인도네시아 자바, 수마트라 및 필리핀 해구
+        [38.4, 27.1], [37.0, 37.0], [35.0, 33.0], [41.0, 29.0],     # 터키 아나톨리아 단층대 및 지중해 그리스 주변
+        [-41.3, 174.8], [-15.0, 167.0], [64.0, -18.0], [28.0, 85.0]  # 뉴질랜드 알프 단층, 아이슬란드 및 히말라야 네팔
     ]
     
     lats, lons = [], []
     for _ in range(num_samples):
-        # 무작위로 하나의 판의 경계 기준 노드를 선택한 뒤 주변으로 응력 확산 처리
-        node = ring_of_fire_nodes[np.random.randint(len(ring_of_fire_nodes))]
-        lats.append(node["lat"] if isinstance(node, dict) else node[0] + np.random.normal(0, 3.2))
-        lons.append(node["lon"] if isinstance(node, dict) else node[1] + np.random.normal(0, 4.0))
+        core = real_seismic_zones[np.random.randint(len(real_seismic_zones))]
+        # 지진 포인트들이 대륙 윤곽선과 판의 경계 주위에 오밀조밀하게 붙도록 표준편차 최적화
+        lats.append(core[0] + np.random.normal(0, 2.2))
+        lons.append(core[1] + np.random.normal(0, 2.8))
         
     df = pd.DataFrame({
         '위도': np.clip(lats, -85, 85),
         '경도': np.clip(lons, -180, 180),
-        '규모': np.random.uniform(2.5, 8.2, num_samples),
-        '진원깊이': np.random.uniform(8, 650, num_samples),
-        '영향도': np.random.uniform(10, 100, num_samples),
+        '규모': np.random.uniform(2.2, 8.5, num_samples),
+        '진원깊이': np.random.uniform(5, 680, num_samples),
+        '영향도': np.random.uniform(8, 100, num_samples),
     })
     return df
 
-df = load_plate_boundary_earthquakes()
+df = load_real_world_earthquakes()
 X = df[FEATURES]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
@@ -146,7 +148,7 @@ st.markdown(
     <div class="photo-top-header">
         <h1>✨ CATCH! TEENIEPING: SHOOTING STAR AURA FACT</h1>
         <div style="color:#7a6fbe; font-size:14px; margin-top:5px; font-weight:700;">
-            (오로라 스페이스 팩트 판의 경계 및 리얼 지진대 홀로그램 분석 콘솔)
+            (오로라 스페이스 팩트 실제 전 세계 대륙 지도 및 지진 동적 매핑 엔진)
         </div>
     </div>
     """,
@@ -177,9 +179,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (판의 경계 지진 지도)")
+        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (진짜 세계 지도 버젼)")
         
-        show_df = df.sample(min(500, len(df)), random_state=77)
+        show_df = df.sample(min(550, len(df)), random_state=88)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
         points_js = []
@@ -189,7 +191,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
             points_js.append(p_str)
         points_js_str = ",\n".join(points_js)
 
-        # 🪐 [밤티 왜곡 해결 마스터 스크립트] 실제 리얼 지진학 판의 경계 벨트를 주입한 고화질 500줄급 샌드박스 코드
+        # 🪐 [진짜 지도 렌더링 스크립트] 실제 지리적 모양을 고스란히 복원한 스페이스 팩트 임베디드 웹 코드
         compact_master_html = f"""
         <!DOCTYPE html>
         <html>
@@ -203,14 +205,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     overflow: hidden;
                 }}
                 
-                /* 🔮 완벽한 1:1 좌우대칭 슈팅스타 팩트 하우징 무대 */
+                /* 🔮 1:1 완벽 정대칭 레이아웃 하우징 프레임 */
                 .shooting-star-pact-container {{
                     position: relative;
                     width: 480px; height: 480px;
                     display: flex; justify-content: center; align-items: center;
                 }}
 
-                /* 👑 상단 크라운 스타 안테나 보석 파츠 (정중앙 앵커링) */
+                /* 👑 상단 마법 크리스탈 안테나 크라운 (정중앙 정렬) */
                 .compact-top-crown {{
                     position: absolute;
                     top: 12px; left: 50%;
@@ -230,7 +232,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     font-size: 15px;
                 }}
 
-                /* ⭐ 하단 도금 황금 스탠드 베이스 받침대 */
+                /* ⭐ 하단 도금 황금 스탠드 베이스 */
                 .star-gold-pedestal-base {{
                     position: absolute;
                     bottom: 12px; left: 50%;
@@ -244,7 +246,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 1; 
                 }}
 
-                /* 👼 [좌우 데칼코마니 완벽 대칭] 리얼 오로라 실크 날개 파츠 */
+                /* 👼 [좌우 데칼코마니 완벽 대칭] 투명 오로라 날개 실드 */
                 .fairy-wing-left {{
                     position: absolute; left: 5px; top: 150px;
                     width: 115px; height: 175px;
@@ -264,7 +266,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 2;
                 }}
 
-                /* 💖 오로라 크롬 핑크 메인 실드 하우징 바디 */
+                /* 💖 3D 로열 핑크 그라데이션 보석 구체 바디 */
                 .fact-pink-heart-shield {{
                     position: relative;
                     width: 360px; height: 360px;
@@ -279,7 +281,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     z-index: 3;
                 }}
 
-                /* ✨ 내부 금도금 베젤 스타 아우라 링 */
+                /* ✨ 내부 금도금 스타 안테나 베젤 링 */
                 .fact-inner-gold-ring {{
                     position: relative;
                     width: 300px; height: 300px;
@@ -290,7 +292,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     display: flex; justify-content: center; align-items: center;
                 }}
 
-                /* 🔒 밤티/일그러짐을 완전 차단한 정원 스크린 코어 돔 */
+                /* 🔒 완벽한 정원을 그리는 투명 글래스 이너 코어 스크린 돔 */
                 .map-inside-binder {{
                     position: relative;
                     width: 276px; height: 276px;
@@ -298,7 +300,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     overflow: hidden;
                     border: 4px solid #ffffff;
                     box-shadow: inset 0 0 35px rgba(0, 242, 254, 0.9);
-                    background: linear-gradient(135deg, #070422 0%, #02010d 100%);
+                    background: linear-gradient(135deg, #060a24 0%, #01020a 100%);
                 }}
 
                 canvas {{
@@ -338,21 +340,25 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 let previousMousePosition = {{ x: 0, y: 0 }};
                 
                 const points = [{points_js_str}];
-                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 9.5 }};
+                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 10.0 }};
 
-                // 🌋 [리얼 텍토닉 맵 플레이트 수식] 밤티 현상을 부수고 지구의 실제 주요 '판의 경계선(지진 벨트)' 벡터 주입
-                const tectonicPlates = [
-                    // 환태평양 지진대 서측 (뉴질랜드-인도네시아-필리핀-일본-쿠릴열도)
-                    [[-45,165], [-35,178], [-20,175], [-12,160], [-5,150], [0,135], [-7,120], [-8,110], [5,125], [15,120], [25,122], [35,135], [40,143], [52,160], [55,170]],
-                    // 환태평양 지진대 동측 (알류샨 열도-알래스카-북미 서부-칠레 해구 가호)
-                    [[55,170], [55,-160], [60,-140], [50,-128], [35,-120], [20,-105], [10,-85], [2,-78], [-15,-75], [-35,-72], [-45,-75], [-55,-68]],
-                    // 알프스-히말라야-인도네시아 대지진 벨트
-                    [[38,25], [37,35], [37,45], [30,55], [32,65], [35,75], [28,85], [25,95], [10,98], [-2,100], [-6,105], [-7,110]],
-                    // 대서양 중앙 해령 벨트 (지구 반대편 윤곽선 참고용)
-                    [[65,-18], [50,-30], [25,-45], [0,-20], [-20,-12], [-40,-15]]
+                // 🗺️ [리얼 월드 맵 제너레이터] 밤송이 왜곡을 파괴하고 유라시아, 아메리카, 아프리카, 호주 형태를 정확히 그리는 세부 데이터셋
+                const realContinentalContours = [
+                    // 아시아-유럽-아프리카 거대 대륙 윤곽선 전체
+                    [[70,20],[75,60],[70,80],[72,100],[65,120],[60,140],[50,142],[40,135],[35,140],[25,122],[10,108],[2,102],[6,96],[15,80],[22,70],[12,50],[25,40],[15,30],[5,10],[-15,15],[-34,20],[-30,30],[-10,40],[5,35],[12,45],[30,32],[32,15],[40,-5],[50,-10],[60,0],[70,20]],
+                    // 한반도 주변 및 아시아 동부 디테일 노드 맵
+                    [[42,130],[40,129],[38,127],[35,126],[34,128],[36,130],[40,130],[42,130]],
+                    // 일본 열도 궤적 정밀 패스
+                    [[44,144],[41,141],[36,138],[34,133],[33,131],[35,134],[38,140],[42,141],[44,144]],
+                    // 북아메리카 대륙 형태 레이어
+                    [[72,-150],[65,-160],[55,-135],[48,-125],[30,-115],[18,-105],[15,-93],[20,-88],[25,-80],[30,-81],[40,-74],[48,-65],[55,-60],[65,-64],[70,-90],[72,-150]],
+                    // 남아메리카 대륙 형태 레이어
+                    [[12,-72],[0,-80],[-12,-78],[-30,-72],[-48,-74],[-55,-68],[-45,-50],[-22,-42],[-6,-35],[5,-53],[12,-72]],
+                    // 오세아니아 오스트레일리아(호주) 대륙 레이어
+                    [[-12,132],[-20,115],[-33,115],[-38,140],[-37,150],[-25,153],[-15,145],[-12,132]]
                 ];
 
-                // 📐 고차원 구체 사영 공간 렌더링 매트릭스 수식
+                // 📐 구체 투영 시 찌그러짐을 방지하는 정밀 공간 변환 알고리즘
                 function project(lat, lon) {{
                     let rLat = (lat * Math.PI) / 180;
                     let rLon = (lon * Math.PI) / 180 + rotationY;
@@ -373,14 +379,14 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, size, size);
                     
-                    // 1단계: 실제 3D 지진대 판의 경계선(Tectonic Plate Lines) 매핑선 드로잉
-                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.65)'; // 지진대 고유의 붉은 레이더 컬러 마킹
-                    ctx.lineWidth = 1.8;
-                    tectonicPlates.forEach(plate => {{
+                    // 1단계: 실제 전 세계 3D 대륙 윤곽선(Real World Landmass) 광학 매핑
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; 
+                    ctx.lineWidth = 1.5;
+                    realContinentalContours.forEach(contour => {{
                         let startNode = true;
                         ctx.beginPath();
-                        for(let i=0; i<plate.length; i++) {{
-                            let p = project(plate[i][0], plate[i][1]);
+                        for(let i=0; i<contour.length; i++) {{
+                            let p = project(contour[i][0], contour[i][1]);
                             if (p.depth > -35) {{ 
                                 if (startNode) {{
                                     ctx.moveTo(p.x, p.y);
@@ -393,7 +399,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }});
 
-                    // 2단계: 홀로그램 보조 위선/경선 그리드 스캔 망 투사
+                    // 2단계: 홀로그램 스캔 위선/경선 격자 서클 레이어 투사
                     ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
                     ctx.lineWidth = 0.9;
                     for (let l = -60; l <= 60; l += 20) {{
@@ -406,7 +412,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
-                    // 3단계: 지진대 위에 완벽 정렬 밀착 처리된 3D 지진 포인트 연산 출력
+                    // 3단계: 진짜 세계 지도 위에 정밀 배치된 3D 지진 포인트 데이터 출력
                     let allPoints = [...points, targetPoint];
                     allPoints.forEach(p => p._proj = project(p.lat, p.lon));
                     allPoints.sort((a, b) => b._proj.depth - a._proj.depth);
@@ -417,12 +423,12 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                             let alpha = Math.max(0.35, (proj.depth + 106) / 212);
                             ctx.beginPath();
                             if (p === targetPoint) {{
-                                ctx.arc(proj.x, proj.y, 9.5, 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, 10.0, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 15;
+                                ctx.shadowBlur = 18;
                                 ctx.shadowColor = '#ffffff';
                             }} else {{
-                                ctx.arc(proj.x, proj.y, Math.max(3.0, p.size * 1.1), 0, 2 * Math.PI);
+                                ctx.arc(proj.x, proj.y, Math.max(3.2, p.size * 1.15), 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color;
                                 ctx.shadowBlur = 0;
                             }}
@@ -531,13 +537,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 판 경계 트래킹 피드</b></h3>
+            <h3 style="margin-top:0; color:#1e1b4b;">🛸 <b>초롱핑의 오로라 리얼 지오그래픽 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
                 [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
             </p>
             <p style="color:#475569; line-height:1.7; font-size:14px; margin:0;">
-                지정한 위도 {lat:.4f}°, 경도 {lon:.4f}° 지반 하부의 판 경계(Tectonic Plate Boundary) 활성 스트레스 스캔이 완료되었습니다츄.
-                가장 가까운 활성 불의 고리 지진대 단층선 코어 영역과의 최단 이격 거리는 약 <b>{nearest_km:,.1f} km</b>로 계산되었습니다츄!
+                지정한 실제 지리적 좌표 위도 {lat:.4f}°, 경도 {lon:.4f}° 대륙 중심부의 정밀 레이더 트래킹이 완료되었습니다츄.
+                실제 대륙 실루엣과 지진 판 경계가 투영된 3D 홀로그램 분석 결과, 인근 활성 강진 진원지 표면과의 최단 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄!
             </p>
         </div>
         """,
