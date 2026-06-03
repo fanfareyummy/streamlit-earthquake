@@ -26,7 +26,7 @@ st.markdown(
         overflow-x: hidden;
     }
     
-    /* 🌠 실시간으로 떨어지는 사선 별빛 애니메이션 효과 */
+    /* 🌠 실시간으로 떨어지는 사선 파스텔 별빛 애니메이션 효과 */
     [data-testid="stAppViewContainer"]::before {
         content: '';
         position: absolute;
@@ -98,40 +98,43 @@ st.markdown(
 def load_pure_quake_data():
     np.random.seed(42)
     
-    # 원본 이미지의 붉은색/초록색/파란색 데이터 분포 패턴 기반 핵심 스팟 매핑
+    # 🗺️ 대륙선 경계와 완벽하게 밀착되도록 수정한 불의 고리(환태평양) 고정밀 스팟 데이터
     seismic_zones = [
-        [61.0, -147.0, 0.15],   # 알래스카 단층선 라인
-        [36.0, -119.0, 0.25],   # 미국 서부 연안 밀집구역 (레드/그린 메인 스팟)
-        [19.0, -102.0, 0.08],   # 중미 멕시코 축
-        [-12.0, -77.0, 0.08],   # 남미 칠레/페루 해구 단층선
-        [38.0, 140.0, 0.22],    # 일본 및 아시아 동부 라인 (우측 파란색 도트 밀집 영역)
-        [14.0, 121.0, 0.07],    # 필리핀 지대
-        [-20.0, 175.0, 0.08],   # 통가 제도 라인
-        [38.0, 23.0, 0.07],     # 지중해/유럽 남부 분기점
+        # [위도, 경도, 가중치]
+        [60.0, -145.0, 0.12],   # 알래스카 연안선
+        [45.0, -123.0, 0.15],   # 북미 서부 캐스케이드 (대륙 윤곽 좌측 상단 상시 스팟)
+        [32.0, -116.0, 0.25],   # 캘리포니아 및 멕시코 서안 (강력 밀집 레드/그린 군집)
+        [-15.0, -75.0, 0.12],   # 남미 페루 대륙 윤곽선 밀착 스팟
+        [-35.0, -72.0, 0.12],   # 남미 칠레 하단 해구선
+        [36.0, 139.0, 0.22],    # 아시아 동부 및 일본 열도 (우측 메인 블루 스팟 밀집 영역)
+        [15.0, 121.0, 0.10],    # 필리핀 및 동남아 판 단층선
+        [-25.0, 135.0, 0.05],   # 호주 내륙 저위험 잔여 스팟
+        [42.0, 15.0, 0.07],     # 지중해 이탈리아/그리스 대륙선 내부 스팟
     ]
     
-    num_samples = 2000
+    num_samples = 2200
     lats, lons, magnitudes, depths, impacts = [], [], [], [], []
     
     for _ in range(num_samples):
         zone_idx = np.random.choice(len(seismic_zones), p=[z[2] for z in seismic_zones] / np.sum([z[2] for z in seismic_zones]))
         base_lat, base_lon, _ = seismic_zones[zone_idx]
         
-        lat = np.clip(base_lat + np.random.normal(0, 2.5), -90.0, 90.0)
-        lon = base_lon + np.random.normal(0, 2.8)
+        # 분산도를 살짝 좁혀서 대륙선 형태를 더 직관적으로 추적하도록 변경
+        lat = np.clip(base_lat + np.random.normal(0, 1.8), -90.0, 90.0)
+        lon = base_lon + np.random.normal(0, 1.8)
         if lon > 180: lon -= 360
         if lon < -180: lon += 360
         
-        # 원본 지도의 군집 특성 (미서부 연안은 고위험 레드군, 동아시아는 블루 깊은 위험군 분포 경향 반영)
-        if base_lon == -119.0:
-            mag = np.random.uniform(5.5, 8.1)
-            depth = np.random.uniform(10, 60)
-        elif base_lon == 140.0:
-            mag = np.random.uniform(4.0, 7.5)
-            depth = np.random.uniform(150, 450)
+        # 원본 지도의 스펙트럼 배정 (북미=고위험 레드, 아시아/일본=깊고 촘촘한 그린/블루)
+        if base_lon in [-116.0, -123.0, -75.0]:
+            mag = np.random.uniform(5.5, 8.3)
+            depth = np.random.uniform(10, 50)
+        elif base_lon == 139.0:
+            mag = np.random.uniform(4.2, 7.8)
+            depth = np.random.uniform(180, 500)
         else:
-            mag = np.random.uniform(1.8, 5.0)
-            depth = np.random.uniform(5, 80)
+            mag = np.random.uniform(2.0, 5.2)
+            depth = np.random.uniform(5, 75)
             
         impact = mag * 10 + np.random.uniform(5, 25)
         lats.append(lat)
@@ -183,6 +186,8 @@ with cx:
 with cy:
     lon = st.number_input("🌌 타겟 경도 (Longitude)", -180.0, 180.0, -120.0, step=0.1)
 
+st.markdown("<br>", unsafe_allow_html=True)
+
 if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매핑 스캔 시작", use_container_width=True):
     dist = haversine(lat, lon, df["위도"].values, df["경도"].values)
     near_idx = np.argsort(dist)[:20]
@@ -198,10 +203,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (대륙 지구본 레이어 탑재판)")
+        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (정밀 대륙 구체 정렬판)")
         
         show_df = df.sample(min(1800, len(df)), random_state=42)
-        # 원본 이미지 색상 매핑: 고위험(레드), 중위험(그린), 저위험(블루)
+        # 🟢 원본 일치 컬러스케일링: 고위험(레드 스팟), 중위험(그린), 저위험(블루)
         HEX_MAP = {"고위험군": "#ef4444", "중위험군": "#22c55e", "저위험군": "#2563eb"}
         
         points_js_items = []
@@ -312,20 +317,20 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const points = [{points_js_str}];
                 const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 9.5 }};
 
-                // 🗺️ 홀로그램 지구본 위에 대륙의 형태를 표현하기 위한 실제 세계 주요 대륙 윤곽선 벡터 맵 데이터
+                // 🗺️ 판 구조와 정밀 싱크를 맞춘 대륙 중심 기하학 데이터셋
                 const landmasses = [
-                    // 북미 대륙 윤곽선 패스 (위도, 경도 리스트)
-                    [[70, -160], [70, -100], [50, -60], [25, -80], [15, -100], [30, -120], [60, -140], [70, -160]],
-                    // 남미 대륙 윤곽선 패스
-                    [[10, -75], [5, -50], [-10, -40], [-35, -50], [-55, -70], [-40, -75], [-20, -70], [0, -80], [10, -75]],
-                    // 유라시아 + 아시아 대륙 윤곽선 패스
-                    [[75, 10], [70, 60], [70, 160], [50, 140], [35, 120], [20, 110], [10, 100], [10, 80], [25, 60], [30, 35], [40, 26], [60, 30], [75, 10]],
-                    // 아프리카 대륙 윤곽선 패스
-                    [[35, 15], [30, 32], [10, 42], [-20, 35], [-34, 20], [-15, 12], [5, 10], [15, -15], [30, -10], [35, 15]],
-                    // 오스트레일리아(호주) 대륙 윤곽선 패스
-                    [[-20, 115], [-12, 136], [-15, 145], [-37, 150], [-35, 117], [-20, 115]],
-                    // 그린란드
-                    [[80, -40], [75, -20], [65, -40], [70, -55], [80, -40]]
+                    // 북미 대륙 내부
+                    [[72, -165], [68, -100], [52, -55], [24, -80], [14, -95], [18, -105], [32, -117], [58, -135], [72, -165]],
+                    // 남미 대륙
+                    [[12, -73], [6, -52], [-8, -36], [-35, -52], [-54, -68], [-42, -76], [-18, -72], [2, -78], [12, -73]],
+                    // 아시아 및 유라시아 전체
+                    [[76, 15], [68, 62], [72, 145], [52, 141], [35, 137], [22, 115], [8, 103], [12, 78], [26, 52], [32, 36], [42, 28], [58, 26], [76, 15]],
+                    // 아프리카 대륙
+                    [[34, 12], [31, 31], [9, 41], [-22, 33], [-33, 19], [-12, 14], [4, 8], [14, -16], [28, -12], [34, 12]],
+                    // 오스트레일리아
+                    [[-21, 114], [-13, 132], [-14, 143], [-36, 148], [-34, 116], [-21, 114]],
+                    // 그린란드 스팟
+                    [[78, -42], [73, -24], [63, -44], [68, -52], [78, -42]]
                 ];
 
                 function project(lat, lon) {{
@@ -348,10 +353,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, size, size);
                     
-                    // 1️⃣ [대륙 윤곽 레이어] 홀로그램 구체 위에 실제 세계 대륙을 투영하여 드로잉
-                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.25)'; // 원본 파스텔톤의 연한 골드빛 대륙선
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'; // 대륙 내부 미세 투명 채우기
-                    ctx.lineWidth = 1.5;
+                    // 1️⃣ [대륙 윤곽 드로잉]
+                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.35)'; 
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; 
+                    ctx.lineWidth = 1.6;
 
                     landmasses.forEach(polygon => {{
                         ctx.beginPath();
@@ -360,8 +365,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         
                         polygon.forEach(coord => {{
                             let proj = project(coord[0], coord[1]);
-                            if (proj.depth > 0) visible = true; // 앞면에 닿아있는 경우만 처리
-                            
+                            if (proj.depth > 0) visible = true;
                             if (first) {{
                                 ctx.moveTo(proj.x, proj.y);
                                 first = false;
@@ -377,9 +381,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         }}
                     }});
 
-                    // 위경도 보조 그리드선
+                    // 보조 격자
                     ctx.strokeStyle = 'rgba(34, 211, 238, 0.15)';
-                    ctx.lineWidth = 0.6;
+                    ctx.lineWidth = 0.5;
                     for (let l = -60; l <= 60; l += 30) {{
                         ctx.beginPath();
                         for (let lng = -180; lng <= 180; lng += 20) {{
@@ -390,7 +394,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
-                    // 2️⃣ [지진 데이터 포인트 레이어] 대륙 위에 입체 정렬 배치
+                    // 2️⃣ [지진 위험군 점 데이터 매핑]
                     let tragedies = [...points, targetPoint];
                     for(let i=0; i<tragedies.length; i++) {{
                         tragedies[i]._proj = project(tragedies[i].lat, tragedies[i].lon);
@@ -401,7 +405,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         let p = tragedies[i];
                         let proj = p._proj;
                         if (proj.depth > -20) {{ 
-                            let alpha = Math.max(0.15, (proj.depth + 126) / 252);
+                            let alpha = Math.max(0.2, (proj.depth + 126) / 252);
                             ctx.beginPath();
                             if (p === targetPoint) {{
                                 ctx.arc(proj.x, proj.y, 8.5, 0, 2 * Math.PI);
@@ -449,10 +453,17 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         
         chart_points = []
         for c in sorted(df["cluster"].unique()):
-            sub_set = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))].sample(min(150, len(df)), replace=True)
-            g_name = grade_map.get(int(c), "저위험군")
-            for _, r in sub_set.iterrows():
-                chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{HEX_MAP[g_name]}', label: '{g_name}'}}")
+            # 🔍 [에러 수정 핵심부]: 타겟 반경 조건을 만족하는 실제 부분 데이터셋을 슬라이싱
+            filtered_df = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))]
+            f_len = len(filtered_df)
+            
+            # 검색 범위 내 데이터가 존재할 때만 안전하게 샘플링 처리하여 예외 원천 봉쇄
+            if f_len > 0:
+                sub_set = filtered_df.sample(min(150, f_len), replace=True)
+                g_name = grade_map.get(int(c), "저위험군")
+                for _, r in sub_set.iterrows():
+                    chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{HEX_MAP[g_name]}', label: '{g_name}'}}")
+                    
         chart_points_str = ",\n".join(chart_points)
 
         canvas_chart_html = f"""
