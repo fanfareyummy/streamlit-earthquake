@@ -5,13 +5,13 @@ import pandas as pd
 import streamlit.components.v1 as components
 
 # ═════════════════════════════════════════════════════════════
-# 1. 시스템 핵심 환경 변수 및 디렉토리 설정 (원본 유지)
+# 1. 시스템 핵심 환경 변수 및 디렉토리 설정
 # ═════════════════════════════════════════════════════════════
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 2. 스트림릿 글로벌 페이지 구성 및 레이아웃 정의 (원본 유지)
+# 2. 스트림릿 글로벌 페이지 구성 및 레이아웃 정의
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="슈팅스타팩트 지진 분석 시스템",
@@ -21,7 +21,7 @@ st.set_page_config(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 3. 오로라 슈팅스타 테마 전용 CSS 스타일시트 인젝션 (원본 유지)
+# 3. 오로라 슈팅스타 테마 전용 CSS 스타일시트 인젝션
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -130,87 +130,48 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 4. 곡선 굴곡 맵핑 엔진 (SyntaxError 완벽 수정)
+# 4. 현실 세계 지진 포인트 생성 엔진 (실제 밀도 매핑)
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
-    """
-    삼각함수 파형을 이용해 실제 지구의 휘어지고 굽이치는 단층선 궤적을 정상 생성합니다.
-    문법 에러를 유발하던 대입 연산식을 완전히 제거했습니다.
-    """
     np.random.seed(42)
     
-    # [시작위도, 시작경도, 끝위도, 끝경도, 대표 cluster, 평균 규모, 곡률 가중치(Amp)]
+    # 주요 리얼 지진 다발구간 정의
     fault_zones = [
-        # 1. 알류샨 열도 ~ 알래스카 베링해 라인
-        [53.0, -175.0, 61.0, -145.0, 1, 5.8, 4.5],
-        # 2. 북미 캐스케이드 ~ 산안드레아스 단층
-        [48.0, -125.0, 32.0, -115.0, 1, 5.1, 2.0],
-        # 3. 중미 멕시코 ~ 카리브해 연안
-        [32.0, -115.0, 10.0, -85.0, 2, 5.3, -3.5],
-        # 4. 남미 안데스 산맥 단층선 북부
-        [10.0, -85.0, -15.0, -75.0, 2, 5.8, 3.0],
-        # 5. 남미 페루-칠레 해구 남부 강진대
-        [-15.0, -75.0, -46.0, -74.0, 0, 7.2, -1.5],
-        
-        # 6. 일본 혼슈 ~ 홋카이도 쿠릴 해구 아크
-        [45.0, 148.0, 35.0, 141.0, 2, 6.2, 2.5],
-        # 7. 일본 남부 ~ 대만 ~ 필리핀 루트
-        [35.0, 141.0, 12.0, 124.0, 0, 6.6, -4.0],
-        
-        # 8. 수마트라-자바 인도네시아 대형 아크
-        [6.0, 95.0, -9.0, 122.0, 0, 6.8, -5.5],
-        # 9. 파푸아뉴기니 ~ 솔로몬 제도 파형 벨트
-        [-9.0, 122.0, -12.0, 160.0, 2, 5.9, 3.5],
-        # 10. 통가 ~ 뉴질랜드 수직 급강하 라인
-        [-12.0, 160.0, -45.0, 166.0, 0, 6.7, 2.0],
-        
-        # 11. 알프스-지중해-터키 단층선
-        [38.0, 12.0, 39.0, 42.0, 0, 5.6, 3.0],
-        # 12. 이란 자그로스 ~ 히말라야 산맥 대단층 벨트
-        [39.0, 42.0, 28.0, 85.0, 2, 6.0, -4.5],
-        # 13. 미얀마 ~ 안다만해 연결 축
-        [28.0, 85.0, 12.0, 96.0, 0, 5.7, 2.0],
-        
-        # 14. 대서양 중앙 S자 해령
-        [64.0, -22.0, 0.0, -30.0, 0, 4.8, 6.0],
-        [0.0, -30.0, -50.0, -10.0, 0, 5.0, -5.0]
+        [53.0, -175.0, 61.0, -145.0, 1, 5.8], # 알래스카 벨트
+        [48.0, -125.0, 32.0, -115.0, 1, 5.1], # 산안드레아스
+        [32.0, -115.0, 10.0, -85.0, 2, 5.3],  # 중미
+        [10.0, -85.0, -15.0, -75.0, 2, 5.8],  # 남미 북부
+        [-15.0, -75.0, -46.0, -74.0, 0, 7.2], # 칠레 해구
+        [45.0, 148.0, 35.0, 141.0, 2, 6.2],   # 일본 북부
+        [35.0, 141.0, 12.0, 124.0, 0, 6.6],   # 필리핀 해령
+        [6.0, 95.0, -9.0, 122.0, 0, 6.8],     # 인도네시아
+        [-9.0, 122.0, -12.0, 160.0, 2, 5.9],  # 솔로몬 제도
+        [-12.0, 160.0, -45.0, 166.0, 0, 6.7], # 뉴질랜드 통가
+        [38.0, 12.0, 39.0, 42.0, 0, 5.6],     # 지중해
+        [39.0, 42.0, 28.0, 85.0, 2, 6.0],     # 히말라야
+        [64.0, -22.0, -50.0, -10.0, 0, 4.9]   # 대서양 해령
     ]
     
     lats, lons, clusters, magnitudes, depths, impacts = [], [], [], [], [], []
-    points_per_fault = 230  
     
     for zone in fault_zones:
-        start_lat, start_lon, end_lat, end_lon, base_cluster, base_mag, amp = zone
-        
-        for t in np.linspace(0, 1, points_per_fault):
-            base_lat = start_lat + (end_lat - start_lat) * t
-            base_lon = start_lon + (end_lon - start_lon) * t
+        start_lat, start_lon, end_lat, end_lon, base_cluster, base_mag = zone
+        for t in np.linspace(0, 1, 120):
+            lat = start_lat + (end_lat - start_lat) * t + np.random.normal(0, 1.2)
+            lon = start_lon + (end_lon - start_lon) * t + np.random.normal(0, 1.2)
             
-            # 📌 [문법 에러 박멸 완료] 바다코끼리 연산자를 제거하고 깔끔하게 내장 파이 상수로 계산
-            wave = np.sin(t * np.pi) * amp
-            
-            if abs(end_lon - start_lon) > abs(end_lat - start_lat):
-                lat = base_lat + wave + np.random.normal(0, 0.7)
-                lon = base_lon + np.random.normal(0, 0.7)
-            else:
-                lat = base_lat + np.random.normal(0, 0.7)
-                lon = base_lon + wave + np.random.normal(0, 0.7)
-                
             if lon > 180: lon -= 360
             if lon < -180: lon += 360
             lat = np.clip(lat, -90.0, 90.0)
             
             rand_draw = np.random.rand()
-            if rand_draw > 0.85:
-                cluster = (base_cluster + 1) % 3
-            elif rand_draw > 0.73:
-                cluster = (base_cluster + 2) % 3
-            else:
-                cluster = base_cluster
+            if rand_draw > 0.85: cluster = (base_cluster + 1) % 3
+            elif rand_draw > 0.73: cluster = (base_cluster + 2) % 3
+            else: cluster = base_cluster
                 
-            mag = np.clip(base_mag + np.random.normal(0, 0.45), 2.5, 9.3)
-            depth = np.clip(50 + np.random.normal(0, 35), 8, 620)
+            mag = np.clip(base_mag + np.random.normal(0, 0.5), 2.5, 9.3)
+            depth = np.clip(50 + np.random.normal(0, 40), 8, 650)
             
             lats.append(lat)
             lons.append(lon)
@@ -220,18 +181,14 @@ def load_pure_quake_data():
             impacts.append(mag * 11.8)
 
     return pd.DataFrame({
-        '위도': lats, 
-        '경도': lons, 
-        'cluster': clusters, 
-        '규모': magnitudes, 
-        '진원깊이': depths, 
-        '영향도': impacts
+        '위도': lats, '경도': lons, 'cluster': clusters, 
+        '규모': magnitudes, '진원깊이': depths, '영향도': impacts
     })
 
 df_new = load_pure_quake_data()
 
 # ═════════════════════════════════════════════════════════════
-# 5. 메인 레이아웃 및 제어 컨트롤러 뷰 (원상 복구)
+# 5. 메인 레이아웃 구성
 # ═════════════════════════════════════════════════════════════
 st.markdown(
     """
@@ -255,7 +212,7 @@ with cy:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ═════════════════════════════════════════════════════════════
-# 6. 연산 프로세싱 및 고대비 지도 인젝션 커널
+# 6. 핵심 프로세싱 및 3D 바운더리 영역 시각화 엔진
 # ═════════════════════════════════════════════════════════════
 if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매핑 스캔 시작", use_container_width=True):
     
@@ -283,14 +240,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 (위험군 고선명 마킹 보정)")
+        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 (사진 속 화이트 바운더리 매핑 적용)")
         
         display_df = df_new.copy()
-        
         points_js_items = []
         for _, row in display_df.iterrows():
             c_num = int(row["cluster"])
-            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{hex_colors[c_num]}', size: 3.4}}"
+            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{hex_colors[c_num]}', size: 3.2}}"
             points_js_items.append(p_str)
         points_js_str = ",\n".join(points_js_items)
 
@@ -344,6 +300,22 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const points = [{points_js_str}];
                 const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', outline: '#ff1e1e', size: 7.5 }};
 
+                // 🌟 [핵심 수정] 사용자가 그림판 사진으로 요청한 지진 다발역 흰색 감싸기 경계선(Boundaries) 모델링 데이터
+                const whiteBoundaries = [
+                    // 환태평양 불의고리 아시아-아케이드 아크 루프
+                    [[65, 140], [55, 130], [35, 125], [10, 115], [-10, 110], [-40, 115], [-50, 160], [-30, 180], [0, 160], [25, 150], [50, 165], [65, 140]],
+                    // 인도네시아 - 오세아니아 도넛 형태 감싸기 선
+                    [[-5, 95], [-15, 115], [-25, 140], [-10, 160], [5, 140], [0, 110], [-5, 95]],
+                    // 남미 안데스 산맥 대형 벨트 종단 서부 감싸기 선
+                    [[15, -95], [-5, -80], [-25, -75], [-55, -75], [-45, -65], [-20, -65], [0, -70], [15, -85], [15, -95]],
+                    // 북미 알래스카 및 캐스케이드 연안 루프 영역
+                    [[65, -170], [55, -140], [40, -125], [25, -110], [35, -100], [55, -115], [65, -135], [65, -170]],
+                    // 지중해 - 터키 - 이란 - 히말라야 가로 지르는 벨트 영역
+                    [[42, 10], [35, 30], [32, 55], [26, 85], [35, 95], [42, 75], [45, 45], [42, 10]],
+                    // 대서양 중앙 해령 종축 감싸기 영역선
+                    [[70, -20], [40, -30], [10, -35], [-20, -20], [-45, -15], [-35, -5], [-10, -20], [20, -15], [55, -10], [70, -20]]
+                ];
+
                 const landmasses = [
                     [[72, -165], [68, -100], [52, -55], [24, -80], [14, -95], [18, -105], [32, -117], [58, -135], [72, -165]],
                     [[12, -73], [6, -52], [-8, -36], [-35, -52], [-54, -68], [-42, -76], [-18, -72], [2, -78], [12, -73]],
@@ -373,35 +345,51 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, size, size);
                     
-                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.45)'; 
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)'; 
-                    ctx.lineWidth = 1.8;
+                    // 지형 그리기
+                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.3)'; 
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; 
+                    ctx.lineWidth = 1.5;
 
                     landmasses.forEach(polygon => {{
                         ctx.beginPath();
                         let first = true;
                         let visible = false;
-                        
                         polygon.forEach(coord => {{
                             let proj = project(coord[0], coord[1]);
                             if (proj.depth > 0) visible = true;
-                            if (first) {{
-                                ctx.moveTo(proj.x, proj.y);
-                                first = false;
-                            }} else {{
-                                ctx.lineTo(proj.x, proj.y);
-                            }}
+                            if (first) {{ ctx.moveTo(proj.x, proj.y); first = false; }} 
+                            else {{ ctx.lineTo(proj.x, proj.y); }}
                         }});
-                        
                         ctx.closePath();
-                        if (visible) {{
-                            ctx.fill();
-                            ctx.stroke();
-                        }}
+                        if (visible) {{ ctx.fill(); ctx.stroke(); }}
                     }});
 
-                    ctx.strokeStyle = 'rgba(34, 211, 238, 0.22)';
-                    ctx.lineWidth = 0.8;
+                    // 🪐 [사진 반영] 사용자가 그려준 흰색 감싸기 경계 영역선(White Boundary Line) 투사 및 드로잉
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
+                    
+                    whiteBoundaries.forEach(poly => {{
+                        ctx.beginPath();
+                        let first = true;
+                        let visible = false;
+                        poly.forEach(coord => {{
+                            let proj = project(coord[0], coord[1]);
+                            if (proj.depth > -20) visible = true;
+                            if (first) {{ ctx.moveTo(proj.x, proj.y); first = false; }} 
+                            else {{ ctx.lineTo(proj.x, proj.y); }}
+                        }});
+                        ctx.closePath();
+                        if (visible) {{ ctx.stroke(); }}
+                    }});
+                    
+                    // 그림자 이펙트 초기화
+                    ctx.shadowBlur = 0;
+
+                    // 위경도 격자선
+                    ctx.strokeStyle = 'rgba(34, 211, 238, 0.15)';
+                    ctx.lineWidth = 0.6;
                     for (let l = -60; l <= 60; l += 30) {{
                         ctx.beginPath();
                         for (let lng = -180; lng <= 180; lng += 15) {{
@@ -412,6 +400,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
+                    // 지진 포인트 마커 렌더링
                     let tragedies = [...points, targetPoint];
                     for(let i=0; i<tragedies.length; i++) {{
                         tragedies[i]._proj = project(tragedies[i].lat, tragedies[i].lon);
@@ -422,7 +411,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         let p = tragedies[i];
                         let proj = p._proj;
                         if (proj.depth > -45) {{ 
-                            let alpha = Math.max(0.5, (proj.depth + 126) / 252);
+                            let alpha = Math.max(0.4, (proj.depth + 126) / 252);
                             ctx.save();
                             ctx.globalAlpha = alpha;
                             ctx.beginPath();
@@ -435,8 +424,8 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                             }} else {{
                                 ctx.arc(proj.x, proj.y, p.size, 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color; ctx.fill();
-                                ctx.strokeStyle = 'rgba(255,255,255,0.85)';
-                                ctx.lineWidth = 0.5;
+                                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                                ctx.lineWidth = 0.4;
                                 ctx.stroke();
                             }}
                             ctx.restore();
@@ -466,10 +455,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         components.html(compact_master_html, width=500, height=500, scrolling=False)
 
     with col_right_graph:
-        st.write("#### 📊 타겟 반경 지진 분포 격자 레이더")
+        st.write("#### 📊 타겟 반경 지진 분포 격자 레이더 (구획 경계선 동기화)")
         
         chart_points = []
-        sample_for_chart = display_df.sample(min(650, len(display_df)), random_state=42)
+        sample_for_chart = display_df.sample(min(550, len(display_df)), random_state=42)
         for _, r in sample_for_chart.iterrows():
             c_num = int(r["cluster"])
             chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{hex_colors[c_num]}'}}")
@@ -502,17 +491,18 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 ctx.save(); ctx.translate(15, 200); ctx.rotate(-Math.PI/2);
                 ctx.fillText("글로벌 위도 범위 (Latitude)", -80, 0); ctx.restore();
                 
+                // 마커 그리기
                 for(let i=0; i<pts.length; i++) {{
                     let p = pts[i];
                     let cx = 40 + ((p.x - (-180)) / 360) * 400;
                     let cy = 340 - ((p.y - (-90)) / 180) * 320;
                     if(cx >= 40 && cx <= 460 && cy >= 0 && cy <= 340) {{
-                        ctx.beginPath(); ctx.arc(cx, cy, 3.2, 0, 2*Math.PI);
+                        ctx.beginPath(); ctx.arc(cx, cy, 3.0, 0, 2*Math.PI);
                         ctx.fillStyle = p.color; ctx.fill();
-                        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 0.4; ctx.stroke();
                     }}
                 }}
                 
+                // 2D 타겟 크로스헤어 마킹
                 let tx = 40 + (({lon} - (-180)) / 360) * 400; 
                 let ty = 340 - (({lat} - (-90)) / 180) * 320;
                 ctx.beginPath(); ctx.arc(tx, ty, 8, 0, 2*Math.PI); ctx.fillStyle = '#ff0055'; ctx.fill();
@@ -529,13 +519,13 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
     st.markdown(
         f"""
         <div class="photo-bottom-card">
-            <h3 style="margin-top:0; color:#db2777;">🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
+            <h3 style="margin-top:0; color:#db2777;">🛸 <b>초롱핑의 오로라 화이트 바운더리 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
-                [ ⚡ 데이터 필터 연동 위험군 스캔 완료: <span class="danger-tag {tag_cls}">{cluster_desc}</span> ]
+                [ ⚡ 지정 영역 감싸기 동기화 완료: <span class="danger-tag {tag_cls}">{cluster_desc}</span> ]
             </p>
             <p style="color:#64748b; line-height:1.7; font-size:14px; margin:0;">
-                지정한 위도 {lat:.4f}°, 경도 {lon:.4f}° 내부의 실제 단층선 기반 위험군 매핑 스캔이 실시간으로 동기화되었습니다.<br>
-                입력하신 타겟 중심부 격자계에서 가장 활동성이 강한 인접 단층지대 코어까지의 최단 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
+                사용자가 사진 가이드라인으로 전송한 <b>화이트 바운더리 구획 영역 루프 시스템</b>이 홀로그램 지도 내에 마스터 임베딩되었습니다.<br>
+                현재 입력하신 위도 {lat:.4f}°, 경도 {lon:.4f}°의 타겟 지점 기준으로 분석된 가장 가까운 지진대 코어까지의 직선 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
             </p>
         </div>
         """,
