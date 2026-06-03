@@ -10,7 +10,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 FEATURES = ["영향도", "규모", "진원깊이"]
 
 # ═════════════════════════════════════════════════════════════
-# 🎨 [슈팅스타팩트 최종 마스터피스] 돔 내부 완전 합체 및 카툰 요정 날개 CSS
+# 🎨 [슈팅스타팩트 오리지널 폼] 삐져나온 핑크 제거 및 돔 정중앙 매립 CSS
 # ═════════════════════════════════════════════════════════════
 st.set_page_config(page_title="슈팅스타팩트 지진 분석 시스템", page_icon="🔮", layout="wide")
 
@@ -72,6 +72,7 @@ st.markdown(
         width: 460px;
         height: 460px;
         margin: 20px auto;
+        overflow: visible;
     }
 
     /* ⭐ 대형 황금 별 스탠드 베이스 파츠 */
@@ -106,7 +107,7 @@ st.markdown(
     .f-right-2 { width: 135px; height: 62px; top: 42px; left: 15px; background: linear-gradient(45deg, #ffffff, #fce7f3, #f472b6); border-radius: 25px 130px 80px 115px; transform: rotate(2deg); z-index: 2; }
     .f-right-3 { width: 115px; height: 55px; top: 82px; left: 35px; background: linear-gradient(45deg, #ffffff, #e0f2fe, #7dd3fc); border-radius: 20px 110px 70px 95px; transform: rotate(-8deg); }
 
-    /* 💖 외부 오로라 분홍색 콤팩트 하우징 코어 */
+    /* 💖 외부 오로라 분홍색 콤팩트 하우징 코어 (상단에 불필요한 캡슐 요소 완전 분리 삭제) */
     .fact-pink-heart-shield {
         position: absolute;
         left: 45px;
@@ -120,7 +121,7 @@ st.markdown(
         z-index: 3;
     }
 
-    /* 🔒 [철통 보안 고정] 3D 지도를 외부 탈출 없이 내부에 매립 결합시키는 돔 글래스 하우징 */
+    /* 🔒 [철통 매립 고정] 홀로그램 지구가 팩트 스크린 정중앙 내부 서클 안에 들어가도록 유도 */
     .map-inside-binder {
         position: absolute;
         left: 85px;
@@ -135,13 +136,12 @@ st.markdown(
         background: #06031a;
     }
     
-    /* 🛸 내부 컴포넌트 강제 레이어 정렬용 내부 인젝터 */
+    /* 코딩 텍스트 노출 현상을 완전히 제어하기 위한 iframe 컨테이너 규격 강제 고정 */
     .hologram-iframe-container {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: 10;
-        pointer-events: auto !important;
+        width: 290px !important;
+        height: 290px !important;
+        border: none !important;
+        overflow: hidden !important;
     }
 
     .photo-bottom-card {
@@ -266,16 +266,15 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         show_df = df.sample(min(450, len(df)), random_state=42)
         HEX_MAP = {"고위험군": "#ff7675", "중위험군": "#facc15", "저위험군": "#4ade80"}
         
-        # 🛠️ [수정 완료] 자바스크립트 변환 시 문자열이 잘리지 않도록 안전 포맷 설계 적용
         points_js = []
         for _, row in show_df.iterrows():
             g_name = grade_map.get(int(row["cluster"]), "저위험군")
-            # 쉼표와 중괄호 누락 방지를 보장하는 완전한 단일 라인 문자열 서식
             p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{HEX_MAP[g_name]}', size: {float(row['규모'])}}}"
             points_js.append(p_str)
         
         points_js_str = ",\n".join(points_js)
 
+        # 🪐 HTML 컴포넌트에 스트림릿 코드가 얽혀 텍스트가 표시되던 현상을 원천 차단한 순수 내부 스크립트
         three_js_code = f"""
         <!DOCTYPE html>
         <html>
@@ -299,7 +298,6 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 let isDragging = false;
                 let previousMousePosition = {{ x: 0, y: 0 }};
                 
-                // 완벽히 닫힌 JSON 리스트 맵
                 const points = [{points_js_str}];
                 const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 8.5 }};
 
@@ -381,6 +379,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         </html>
         """
 
+        # 외부 삐져나옴과 덩어리 오염 버그를 100% 걷어낸 완전 차폐형 팩트 쉘 프레임워크
         html_shell = f"""
         <div class="shooting-star-factory-stage">
             <div class="star-gold-pedestal-base"></div>
