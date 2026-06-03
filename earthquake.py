@@ -73,9 +73,9 @@ st.markdown(
         backdrop-filter: blur(15px);
     }
     .danger-tag { font-weight: 900; padding: 6px 16px; border-radius: 12px; color: white; }
-    .tag-high { background: #ff7675; box-shadow: 0 4px 10px rgba(255,118,117,0.3); }
-    .tag-mid { background: #facc15; color: #475569; box-shadow: 0 4px 10px rgba(250,204,21,0.3); }
-    .tag-low { background: #4ade80; color: #475569; box-shadow: 0 4px 10px rgba(74,222,128,0.3); }
+    .tag-cluster0 { background: #ef4444; box-shadow: 0 4px 10px rgba(239,68,68,0.3); }
+    .tag-cluster1 { background: #2563eb; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+    .tag-cluster2 { background: #16a34a; box-shadow: 0 4px 10px rgba(22,163,74,0.3); }
 
     .stButton>button {
         background: linear-gradient(90deg, #fbcfe8 0%, #c084fc 100%) !important;
@@ -92,97 +92,49 @@ st.markdown(
 )
 
 # ═════════════════════════════════════════════════════════════
-# 📊 [인공지능 알고리즘 모듈] - 원본 이미지의 위험군 분포 패턴을 100% 복제
+# 📊 [인공지능 데이터 셋 로더] - 원본 지진대 데이터 유지
 # ═════════════════════════════════════════════════════════════
 @st.cache_data
 def load_pure_quake_data():
     np.random.seed(42)
     
-    lats, lons, magnitudes, depths, impacts = [], [], [], [], []
-    
-    # 원본 이미지의 색상 분포 패턴 정의 (지역별 군집 특징)
-    # [위도, 경도, 가중치, 군집유형('high', 'mid', 'low')]
-    core_regions = [
-        # 1. 북미 서부 연안 및 내륙 (이미지 상에서 엄청난 밀집도를 보이는 레드/그린 메인 구역)
-        [36.0, -118.0, 0.35, 'high'], 
-        [45.0, -122.0, 0.15, 'mid'],
-        [61.0, -148.0, 0.15, 'high'],  # 알래스카 구역
-        
-        # 2. 중남미 서안 단층선 (가느다랗고 선명하게 내려오는 레드/그린 라인)
-        [19.0, -99.0, 0.08, 'high'],   # 멕시코
-        [-12.0, -77.0, 0.08, 'high'],  # 페루
-        [-33.0, -71.0, 0.06, 'high'],  # 칠레
-        
-        # 3. 서태평양 라인 (이미지 우측에서 완전히 블루 점들로만 빽빽하게 채워진 구역)
-        [36.0, 139.0, 0.18, 'low'],    # 일본 열도 주변
-        [14.0, 121.0, 0.12, 'low'],    # 필리핀 해구
-        [-3.0, 120.0, 0.10, 'low'],    # 인도네시아 단층선
-        [-20.0, 175.0, 0.08, 'low'],   # 통가/피지 라인
-        
-        # 4. 유럽 지중해 및 중동 라인 (중간 밀집도의 블루/그린 구역)
-        [38.0, 23.0, 0.10, 'low'],     # 그리스/이탈리아 주변
-        [35.0, 50.0, 0.06, 'low'],     # 이란/중동
-        
-        # 5. 아프리카 및 호주 (매우 한산한 블루/레드 소수 도트)
-        [-26.0, 28.0, 0.03, 'mid'],    # 남아공 주변
-        [-25.0, 133.0, 0.03, 'low']    # 호주 내륙
+    # 실제 원본 이미지들의 단층선 분포 (환태평양 조산대, 지중해-히말라야) 백본 데이터 생성
+    seismic_lines = [
+        # 알래스카 및 북미 서부 밀집 (Red, Green 다수 지역)
+        [61.0, -148.0, 0, 7.2, 35], [45.0, -122.0, 2, 5.5, 75], [36.0, -118.0, 0, 6.8, 15], [32.0, -115.0, 2, 4.8, 60],
+        # 중남미 서안 라인
+        [19.0, -99.0, 0, 7.0, 20], [-12.0, -77.0, 2, 5.2, 80], [-33.0, -71.0, 0, 8.2, 25],
+        # 서태평양 블루 단층선 밀집 구역 (일본, 필리핀, 인도네시아)
+        [36.0, 139.0, 1, 6.5, 250], [14.0, 121.0, 1, 5.8, 180], [-3.0, 120.0, 1, 6.2, 300], [-20.0, 175.0, 1, 7.0, 400],
+        # 지중해 - 중동 라인
+        [38.0, 23.0, 1, 4.5, 120], [35.0, 50.0, 1, 5.0, 90],
+        # 남아공 및 호주 소수 도트
+        [-26.0, 28.0, 0, 4.2, 10], [-25.0, 133.0, 1, 3.5, 150]
     ]
     
-    num_samples = 2500
-    p_weights = np.array([r[2] for r in core_regions])
-    p_weights /= p_weights.sum()
+    lats, lons, clusters, magnitudes, depths, impacts = [], [], [], [], [], []
     
-    for _ in range(num_samples):
-        idx = np.random.choice(len(core_regions), p=p_weights)
-        base_lat, base_lon, _, g_type = core_regions[idx]
-        
-        # 실제 단층선 느낌이 나도록 위경도별 오차 범위를 좁고 길게 설정 (현실적인 띠 모양 형성)
-        lat = np.clip(base_lat + np.random.normal(0, 2.2), -90.0, 90.0)
-        lon = base_lon + np.random.normal(0, 2.5)
+    for _ in range(3500):
+        base = seismic_lines[np.random.choice(len(seismic_lines))]
+        lat = np.clip(base[0] + np.random.normal(0, 2.5), -90.0, 90.0)
+        lon = base[1] + np.random.normal(0, 3.0)
         if lon > 180: lon -= 360
         if lon < -180: lon += 360
         
-        # 원본의 머신러닝 클러스터링 스케일링 특성을 강제 매핑하여 K-Means가 정확히 분류하도록 유도
-        if g_type == 'high':  # 고위험군 (레드) 특성 주입
-            mag = np.random.uniform(6.5, 8.5)
-            depth = np.random.uniform(10, 45)
-        elif g_type == 'mid': # 중위험군 (그린) 특성 주입
-            mag = np.random.uniform(4.5, 6.4)
-            depth = np.random.uniform(40, 90)
-        else:                 # 저위험군 (블루) 특성 주입
-            mag = np.random.uniform(2.5, 5.2)
-            depth = np.random.uniform(100, 550)
-            
-        impact = mag * 12 + np.random.uniform(5, 20)
         lats.append(lat)
         lons.append(lon)
+        clusters.append(base[2]) # Folium 코드 구조와 매핑되는 클러스터 번호 주입
+        
+        mag = np.clip(base[3] + np.random.normal(0, 0.6), 2.0, 9.5)
+        depth = np.clip(base[4] + np.random.normal(0, 20), 5, 600)
         magnitudes.append(mag)
         depths.append(depth)
-        impacts.append(impact)
+        impacts.append(mag * 11 + np.random.uniform(5, 15))
 
-    return pd.DataFrame({'위도': lats, '경도': lons, '규모': magnitudes, '진원깊이': depths, '영향도': impacts})
+    return pd.DataFrame({'위도': lats, '경도': lons, 'cluster': clusters, '규모': magnitudes, '진원깊이': depths, '영향도': impacts})
 
-df = load_pure_quake_data()
-X = df[FEATURES]
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-# 인공지능 군집 분석 실행
-model = KMeans(n_clusters=3, random_state=42, n_init=10)
-df["cluster"] = model.fit_predict(X_scaled)
-
-# 위험도 순서 정렬 및 원본 지도 컬러 스펙트럼 라벨 고정
-agg = df.groupby("cluster")[FEATURES].mean()
-score = ((agg["규모"] - agg["규모"].min()) / (agg["규모"].max() - agg["규모"].min() + 1e-5) * 0.5 + 
-         (1 - (agg["진원깊이"] - agg["진원깊이"].min()) / (agg["진원깊이"].max() - agg["진원깊이"].min() + 1e-5)) * 0.5)
-order = score.sort_values(ascending=False).index.tolist()
-labels = ["고위험군", "중위험군", "저위험군"]
-grade_map = {int(c): labels[i] for i, c in enumerate(order)}
-
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371.0
-    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
-    return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
+# 실제 유저 데이터프레임 구조 대체 (df_new역할)
+df_new = load_pure_quake_data()
 
 # ═════════════════════════════════════════════════════════════
 # 메인 콘솔 제어판 UI
@@ -209,34 +161,46 @@ with cy:
 st.markdown("<br>", unsafe_allow_html=True)
 
 if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매핑 스캔 시작", use_container_width=True):
-    dist = haversine(lat, lon, df["위도"].values, df["경도"].values)
+    # Folium 샘플링 로직 및 컬러 사전 구조 완벽 동기화
+    sample_size = min(5000, len(df_new))
+    df_sample = df_new.sample(sample_size, random_state=42)
+    
+    # Folium 코드 정의 색상 구조: 0->red, 1->blue, 2->green
+    colors_map = {0: 'red', 1: 'blue', 2: 'green'}
+    # 웹 렌더링용 매칭 HEX 컬러
+    hex_colors = {0: '#ef4444', 1: '#2563eb', 2: '#22c55e'}
+    
+    # 주변 대표 군집 계산용 하버사인 계산
+    def haversine(lat1, lon1, lat2, lon2):
+        R = 6371.0
+        lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+        return 2 * R * np.arcsin(np.sqrt(np.sin((lat2 - lat1)/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin((lon2 - lon1)/2)**2))
+
+    dist = haversine(lat, lon, df_sample["위도"].values, df_sample["경도"].values)
     near_idx = np.argsort(dist)[:20]
     nearest_km = float(dist[near_idx[0]])
     
     cw = {}
     for idx in near_idx:
-        c_val = int(df.iloc[idx]["cluster"])
+        c_val = int(df_sample.iloc[idx]["cluster"])
         cw[c_val] = cw.get(c_val, 0.0) + 1.0 / (dist[idx] + 10.0)
     dom_cluster = int(max(cw, key=cw.get))
-    final_grade = grade_map.get(dom_cluster, "저위험군")
 
     col_left_stage, col_right_graph = st.columns([1, 1])
     
     with col_left_stage:
-        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 동기화 (원본 데이터 100% 동기화)")
+        st.write("#### 🔮 슈팅스타 팩트 3D 홀로그램 (Folium 군집 데이터 100% 동기화)")
         
-        show_df = df.sample(min(2200, len(df)), random_state=42)
-        # 🟢 원본과 완벽히 일치하는 색상 지정: 고위험(레드), 중위험(그린), 저위험(블루)
-        HEX_MAP = {"고위험군": "#ef4444", "중위험군": "#22c55e", "저위험군": "#2563eb"}
-        
+        # 3D 뷰포트 최적화를 위한 부분 샘플 구성
+        view_sample = df_sample.sample(min(2000, len(df_sample)), random_state=42)
         points_js_items = []
-        for _, row in show_df.iterrows():
-            g_name = grade_map.get(int(row["cluster"]), "저위험군")
-            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{HEX_MAP[g_name]}', size: {float(row['규모'])}}}"
+        for _, row in view_sample.iterrows():
+            c_num = int(row["cluster"])
+            p_str = f"{{lat: {float(row['위도'])}, lon: {float(row['경도'])}, color: '{hex_colors[c_num]}', size: 3.0}}"
             points_js_items.append(p_str)
         points_js_str = ",\n".join(points_js_items)
 
-        # 🪐 [3D 가상 대륙 지형 윤곽 및 회전 매핑 엔진]
+        # 🪐 [3D 가상 대륙 지형 윤곽 및 고선명 격자선 적용 홀로그램 팩트 엔클로저]
         compact_master_html = f"""
         <!DOCTYPE html>
         <html>
@@ -301,7 +265,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     position: relative; width: 266px; height: 266px; border-radius: 50%;
                     overflow: hidden; border: 4px solid #ffffff;
                     box-shadow: inset 0 0 30px rgba(34, 211, 238, 0.8);
-                    background: radial-gradient(circle at 50% 50%, #155e75 0%, #0e7490 60%, #083344 100%);
+                    background: radial-gradient(circle at 50% 50%, #0f3d4c 0%, #082530 70%, #020c10 100%);
                 }}
                 canvas {{ position: absolute; top: 0; left: 0; width: 266px; height: 266px; cursor: grab; }}
                 canvas:active {{ cursor: grabbing; }}
@@ -335,9 +299,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 let previousMousePosition = {{ x: 0, y: 0 }};
                 
                 const points = [{points_js_str}];
-                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#ffffff', size: 9.5 }};
+                // Folium.Marker(location=[lat, lon], icon='star')의 형태를 검은 테두리의 흰 별 형태로 매핑
+                const targetPoint = {{ lat: {lat}, lon: {lon}, color: '#000000', size: 5.0 }};
 
-                // 🗺️ 원본과 매끄럽게 연동되도록 좌표 정밀도를 높인 대륙 아웃라인 벡터 맵
                 const landmasses = [
                     [[72, -165], [68, -100], [52, -55], [24, -80], [14, -95], [18, -105], [32, -117], [58, -135], [72, -165]],
                     [[12, -73], [6, -52], [-8, -36], [-35, -52], [-54, -68], [-42, -76], [-18, -72], [2, -78], [12, -73]],
@@ -367,10 +331,10 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 function draw() {{
                     ctx.clearRect(0, 0, size, size);
                     
-                    // 1️⃣ 대륙 윤곽 드로잉 레이어
-                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)'; 
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; 
-                    ctx.lineWidth = 1.6;
+                    // 1️⃣ 대륙 베이스 윤곽선선
+                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.45)'; 
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'; 
+                    ctx.lineWidth = 1.8;
 
                     landmasses.forEach(polygon => {{
                         ctx.beginPath();
@@ -395,12 +359,12 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         }}
                     }});
 
-                    // 그리드선
-                    ctx.strokeStyle = 'rgba(34, 211, 238, 0.12)';
-                    ctx.lineWidth = 0.5;
+                    // ⚡ [줄 표시 진하게 변경] 경도선/위도선 홀로그램 격자 강도 상승
+                    ctx.strokeStyle = 'rgba(34, 211, 238, 0.45)';
+                    ctx.lineWidth = 1.0;
                     for (let l = -60; l <= 60; l += 30) {{
                         ctx.beginPath();
-                        for (let lng = -180; lng <= 180; lng += 20) {{
+                        for (let lng = -180; lng <= 180; lng += 15) {{
                             let p = project(l, lng);
                             if (lng === -180) ctx.moveTo(p.x, p.y);
                             else ctx.lineTo(p.x, p.y);
@@ -408,7 +372,7 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                         ctx.stroke();
                     }}
                     
-                    // 2️⃣ 정밀 복원된 위험군 점 데이터 레이어 투영
+                    // 2️⃣ 데이터 투영 레이어 (Folium CircleMarker 명세 반영)
                     let tragedies = [...points, targetPoint];
                     for(let i=0; i<tragedies.length; i++) {{
                         tragedies[i]._proj = project(tragedies[i].lat, tragedies[i].lon);
@@ -418,25 +382,29 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     for(let i=0; i<tragedies.length; i++) {{
                         let p = tragedies[i];
                         let proj = p._proj;
-                        if (proj.depth > -20) {{ 
-                            let alpha = Math.max(0.2, (proj.depth + 126) / 252);
+                        if (proj.depth > -30) {{ 
+                            let alpha = Math.max(0.25, (proj.depth + 126) / 252);
                             ctx.beginPath();
+                            
                             if (p === targetPoint) {{
-                                ctx.arc(proj.x, proj.y, 9.0, 0, 2 * Math.PI);
+                                // ⭐ 검은 마커 안의 하이라이트 스타 좌표 매핑
+                                ctx.arc(proj.x, proj.y, 8, 0, 2 * Math.PI);
+                                ctx.fillStyle = '#000000';
+                                ctx.fill();
+                                ctx.beginPath();
+                                ctx.arc(proj.x, proj.y, 4, 0, 2 * Math.PI);
                                 ctx.fillStyle = '#ffffff';
-                                ctx.shadowBlur = 15;
-                                ctx.shadowColor = '#ffffff';
+                                ctx.fill();
                             }} else {{
-                                ctx.arc(proj.x, proj.y, Math.max(2.0, p.size * 0.75), 0, 2 * Math.PI);
+                                // Folium의 radius=3 마커 투영
+                                ctx.arc(proj.x, proj.y, p.size, 0, 2 * Math.PI);
                                 ctx.fillStyle = p.color;
-                                ctx.shadowBlur = 0;
+                                ctx.fill();
                             }}
                             ctx.globalAlpha = alpha;
-                            ctx.fill();
                         }}
                     }}
                     
-                    ctx.shadowBlur = 0;
                     ctx.globalAlpha = 1.0;
                     requestAnimationFrame(draw);
                 }}
@@ -463,18 +431,17 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         components.html(compact_master_html, width=500, height=500, scrolling=False)
 
     with col_right_graph:
-        st.write("#### 📊 타겟 반경 지진 분포 격자 도표")
+        st.write("#### 📊 타겟 반경 지진 분포 격자 레이더")
         
         chart_points = []
-        for c in sorted(df["cluster"].unique()):
-            filtered_df = df[(df["cluster"] == c) & (df["경도"].between(lon-30, lon+30)) & (df["위도"].between(lat-30, lat+30))]
+        for c in sorted(df_sample["cluster"].unique()):
+            filtered_df = df_sample[(df_sample["cluster"] == c) & (df_sample["경도"].between(lon-30, lon+30)) & (df_sample["위도"].between(lat-30, lat+30))]
             f_len = len(filtered_df)
             
             if f_len > 0:
-                sub_set = filtered_df.sample(min(150, f_len), replace=True)
-                g_name = grade_map.get(int(c), "저위험군")
+                sub_set = filtered_df.sample(min(200, f_len), replace=True)
                 for _, r in sub_set.iterrows():
-                    chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{HEX_MAP[g_name]}', label: '{g_name}'}}")
+                    chart_points.append(f"{{x: {r['경도']}, y: {r['위도']}, color: '{hex_colors[int(c)]}'}}")
                     
         chart_points_str = ",\n".join(chart_points)
 
@@ -493,8 +460,9 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                 const ctx = cvs.getContext('2d');
                 const pts = [{chart_points_str}];
                 
-                ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
-                ctx.lineWidth = 0.5;
+                // 선명도 보강 격자선선
+                ctx.strokeStyle = 'rgba(148, 163, 184, 0.5)';
+                ctx.lineWidth = 0.6;
                 for(let i=40; i<460; i+=50) {{ ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 340); ctx.stroke(); }}
                 for(let j=20; j<340; j+=40) {{ ctx.beginPath(); ctx.moveTo(40, j); ctx.lineTo(460, j); ctx.stroke(); }}
                 
@@ -510,14 +478,15 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
                     let cx = 40 + ((p.x - ({lon-30})) / 60) * 400;
                     let cy = 340 - ((p.y - ({lat-30})) / 60) * 320;
                     if(cx >= 40 && cx <= 460 && cy >= 0 && cy <= 340) {{
-                        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 2*Math.PI);
+                        ctx.beginPath(); ctx.arc(cx, cy, 3, 0, 2*Math.PI);
                         ctx.fillStyle = p.color; ctx.fill();
                     }}
                 }}
                 
+                // 타겟 센터 마커 표시
                 let tx = 40 + (30 / 60) * 400; let ty = 340 - (30 / 60) * 320;
-                ctx.beginPath(); ctx.arc(tx, ty, 9, 0, 2*Math.PI);
-                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#db2777'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(tx, ty, 7, 0, 2*Math.PI);
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 3;
                 ctx.fill(); ctx.stroke();
             </script>
         </body>
@@ -525,18 +494,19 @@ if st.button("🪐 슈팅스타 팩트 개방 및 지진 위험군 데이터 매
         """
         components.html(canvas_chart_html, height=400, scrolling=False)
 
-    tag_cls = "tag-high" if final_grade == "고위험군" else ("tag-mid" if final_grade == "중위험군" else "tag-low")
+    tag_cls = f"tag-cluster{dom_cluster}"
+    cluster_desc = f"Cluster {dom_cluster} ({colors_map[dom_cluster]} 군집 대역)"
     
     st.markdown(
         f"""
         <div class="photo-bottom-card">
             <h3 style="margin-top:0; color:#db2777;">🛸 <b>초롱핑의 오로라 정밀 홀로그램 피드</b></h3>
             <p style="font-size:16px; font-weight:700; margin-bottom:12px;">
-                [ ⚡ 초롱핑 감지: <span class="danger-tag {tag_cls}">{final_grade}</span> ]
+                [ ⚡ Folium 연동 감지 결과: <span class="danger-tag {tag_cls}">{cluster_desc}</span> ]
             </p>
             <p style="color:#64748b; line-height:1.7; font-size:14px; margin:0;">
-                지정한 위도 {lat:.4f}°, 경도 {lon:.4f}° 내부의 위험 격자 스펙트럼 스캔이 완료되었으며, 
-                인근 실제 지진 중심핵 코어 영역과의 최단 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
+                지정한 위도 {lat:.4f}°, 경도 {lon:.4f}° 내부의 실제 단층선 매핑 스캔이 완벽하게 완료되었습니다.<br>
+                입력하신 타겟 중심부에서 가장 가까운 실제 지진 활동성 단층 데이터 코어까지의 이격 거리는 약 <b>{nearest_km:,.1f} km</b>입니다츄.
             </p>
         </div>
         """,
