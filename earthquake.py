@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# 전역 스타일 및 3D 시뮬레이터 CSS (글자색은 아래에서 직접 완벽 제어)
+# 전역 CSS 스타일 레이아웃
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght=400;700&display=swap');
@@ -119,8 +119,8 @@ if df is None:
 # --- 3. 헤더 섹션 ---
 st.markdown("""
     <div class='hospital-header'>
-        <div style='font-size: 1.8rem; font-weight: 700; color: #0369A1;'>🩺 스마트 의료 통합 관제 센터 <span style='font-size:1.2rem; color:#475569;'>[V11.0 HARD_CODED_BLACK]</span></div>
-        <div style='background: #E0F2FE; border: 1px solid #0EA5E9; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; color: #0369A1; font-weight: 700;'>● 텍스트 인라인 블랙 아웃 패치 완료</div>
+        <div style='font-size: 1.8rem; font-weight: 700; color: #0369A1;'>🩺 스마트 의료 통합 관제 센터 <span style='font-size:1.2rem; color:#475569;'>[V11.5 ABSOLUTE_BLACK]</span></div>
+        <div style='background: #E0F2FE; border: 1px solid #0EA5E9; padding: 5px 15px; border-radius: 50px; font-size: 0.85rem; color: #0369A1; font-weight: 700;'>● 샌드박스 격리형 블랙 폰트 컴포넌트 적용</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -194,32 +194,43 @@ with col_globe:
         </div>
     """, unsafe_allow_html=True)
     
-    # 🚨 [100% 완전 해결] 테마 변동에 절대 영향받지 않는 하드코딩 순수 검정색 인라인 메트릭 보드
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.markdown("""
-            <div style="background: #FFFFFF; border: 1px solid #CBD5E1; padding: 15px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.85rem; color: #000000 !important; font-weight: 700; margin-bottom: 6px;">🦠 주요 변이 위험도</div>
-                <div style="font-size: 1.9rem; color: #000000 !important; font-weight: 700; line-height: 1.2;">위험 (BA.5)</div>
-                <div style="font-size: 0.8rem; color: #EF4444; font-weight: 700; margin-top: 6px;">▲ 상승 지표</div>
+    # 🚨 [완벽 해결] 외부 렌더링 서버(iframe 컴포넌트)를 이용하여 Streamlit이 절대 덮어쓸 수 없는 완전무결한 흑색 패널 구현
+    black_metrics_html = """
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: transparent; overflow: hidden; }
+            .metric-container { display: flex; gap: 14px; width: 100%; justify-content: space-between; }
+            .metric-card { background: #FFFFFF; border: 1px solid #CBD5E1; padding: 14px; border-radius: 14px; flex: 1; box-sizing: border-box; }
+            .label { font-size: 13px; color: #000000 !important; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+            .value { font-size: 28px; color: #000000 !important; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; }
+            .delta-red { font-size: 12px; color: #EF4444 !important; font-weight: 700; margin-top: 5px; }
+            .delta-green { font-size: 12px; color: #22C55E !important; font-weight: 700; margin-top: 5px; }
+        </style>
+    </head>
+    <body>
+        <div class="metric-container">
+            <div class="metric-card">
+                <div class="label">🦠 주요 변이 위험도</div>
+                <div class="value">위험 (BA.5)</div>
+                <div class="delta-red">▲ 상승 지표</div>
             </div>
-        """, unsafe_allow_html=True)
-    with m2:
-        st.markdown("""
-            <div style="background: #FFFFFF; border: 1px solid #CBD5E1; padding: 15px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.85rem; color: #000000 !important; font-weight: 700; margin-bottom: 6px;">🛡️ 타겟 반경 방역 지수</div>
-                <div style="font-size: 1.9rem; color: #000000 !important; font-weight: 700; line-height: 1.2;">82.4 점</div>
-                <div style="font-size: 0.8rem; color: #22C55E; font-weight: 700; margin-top: 6px;">▲ 안전 범위</div>
+            <div class="metric-card">
+                <div class="label">🛡️ 타겟 반경 방역 지수</div>
+                <div class="value">82.4 점</div>
+                <div class="delta-green">▲ 안전 범위</div>
             </div>
-        """, unsafe_allow_html=True)
-    with m3:
-        st.markdown("""
-            <div style="background: #FFFFFF; border: 1px solid #CBD5E1; padding: 15px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <div style="font-size: 0.85rem; color: #000000 !important; font-weight: 700; margin-bottom: 6px;">🧬 유전자 서열 일치율</div>
-                <div style="font-size: 1.9rem; color: #000000 !important; font-weight: 700; line-height: 1.2;">99.8 %</div>
-                <div style="font-size: 0.8rem; color: #22C55E; font-weight: 700; margin-top: 6px;">▲ 변이 확인</div>
+            <div class="metric-card">
+                <div class="label">🧬 유전자 서열 일치율</div>
+                <div class="value">99.8 %</div>
+                <div class="delta-green">▲ 변이 확인</div>
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    </body>
+    </html>
+    """
+    st.components.v1.html(black_metrics_html, height=115)
 
 with col_media:
     st.markdown("<p style='font-size:0.9rem; font-weight:700; color:#000000; margin-bottom:10px;'>🔬 SARS-CoV-2 (코로나 바이러스) 입체 구조 분석 시뮬레이터</p>", unsafe_allow_html=True)
